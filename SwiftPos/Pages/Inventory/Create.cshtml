@@ -1,0 +1,29 @@
+﻿@page
+@model SwiftPOS.Pages.Inventory.CreateModel
+<div class="card shadow-sm border-0 p-4">
+    <h3>Add New Product</h3>
+    <form method="post">
+        <div class="mb-3">
+            <label>Name</label><input asp-for="Name" class="form-control" required />
+        </div>
+        <div class="mb-3">
+            <label>Category</label><input asp-for="Category" class="form-control" required />
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label>Price</label><input asp-for="Price" type="number" step="0.01" class="form-control" required />
+            </div>
+            <div class="col-md-6 mb-3">
+                <label>Type</label>
+                <select asp-for="SelectedType" class="form-select" onchange="document.getElementById('sDiv').style.display = this.value=='Service'?'none':'block'">
+                    <option value="Physical">Physical</option>
+                    <option value="Service">Service</option>
+                </select>
+            </div>
+        </div>
+        <div class="mb-3" id="sDiv">
+            <label>Stock</label><input asp-for="Stock" type="number" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary">Save Product</button>
+    </form>
+</div>

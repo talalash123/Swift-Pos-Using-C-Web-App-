@@ -1,0 +1,115 @@
+﻿@page
+@model SwiftPOS.Pages.SalesHistoryModel
+@{
+    ViewData["Title"] = "Sales History";
+}
+
+<style>
+    .history-card { border: none; border-radius: 15px; background: white; box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1); }
+    .filter-box { background: white; border-radius: 10px; padding: 15px; border: 1px solid #eee; }
+    .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; fw-bold; }
+    .bg-soft-success { background: #e6f7f3; color: #1cc88a; }
+    .summary-banner { background: #005f73; color: white; border-radius: 15px; padding: 30px; position: relative; overflow: hidden; }
+    .summary-banner::after { content: ""; position: absolute; right: -20px; top: -20px; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%; }
+</style>
+
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center my-4">
+        <div>
+            <h3 class="fw-bold mb-0">Sales History</h3>
+            <p class="text-muted small">Reviewing transaction data for SwiftPOS</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-download me-1"></i> Export CSV</button>
+            <a href="/POS/Index" class="btn btn-dark btn-sm px-3">+ New Transaction</a>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <label class="small fw-bold text-muted">DATE RANGE</label>
+            <select class="form-select border-0 shadow-sm mt-1">
+                <option>Last 7 Days</option>
+                <option>This Month</option>
+                <option>Custom Range</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="small fw-bold text-muted">PAYMENT STATUS</label>
+            <select class="form-select border-0 shadow-sm mt-1">
+                <option>All Statuses</option>
+                <option>Completed</option>
+                <option>Pending</option>
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label class="small fw-bold text-muted">QUICK SEARCH</label>
+            <input type="text" class="form-control border-0 shadow-sm mt-1" placeholder="Order ID or Customer Name...">
+        </div>
+    </div>
+
+    <div class="card history-card p-4 border-0 mb-4">
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead class="text-muted small border-bottom">
+                    <tr>
+                        <th>TRANSACTION ID</th>
+                        <th>DATE & TIME</th>
+                        <th>CUSTOMER NAME</th>
+                        <th>TOTAL AMOUNT</th>
+                        <th>STATUS</th>
+                        <th>RECEIPT</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model.Orders)
+                    {
+                        <tr>
+                            <td class="fw-bold text-primary">#TRX-@order.Id.Substring(Math.Max(0, order.Id.Length - 5))</td>
+                            <td>
+                                <div class="fw-bold small">@order.OrderDate.ToString("MMM dd, yyyy")</div>
+                                <div class="text-muted smaller">@order.OrderDate.ToString("hh:mm tt")</div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="bg-light rounded-circle p-2 small">@order.CustomerName.Substring(0, 1)</div>
+                                    <span>@order.CustomerName</span>
+                                </div>
+                            </td>
+                            <td class="fw-bold">$@order.GrandTotal.ToString("N2")</td>
+                            <td><span class="status-badge bg-soft-success fw-bold">COMPLETED</span></td>
+                            <td><button class="btn btn-sm btn-light border text-muted">View <i class="bi bi-file-earmark-text"></i></button></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-8">
+            <div class="summary-banner shadow-sm d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="mb-1 text-uppercase small opacity-75">Volume Overview</p>
+                    <h1 class="fw-bold mb-0">$@Model.TotalPeriodRevenue.ToString("N2")</h1>
+                    <p class="mb-0 small mt-2"><i class="bi bi-graph-up-arrow text-info"></i> 12.4% Daily Total Increase</p>
+                </div>
+                <div class="d-flex align-items-end gap-2" style="height: 60px;">
+                    <div class="bg-white opacity-25" style="width:10px; height:40%;"></div>
+                    <div class="bg-white opacity-50" style="width:10px; height:70%;"></div>
+                    <div class="bg-white" style="width:10px; height:100%;"></div>
+                    <div class="bg-white opacity-25" style="width:10px; height:50%;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card history-card p-4 h-100">
+                <h6 class="fw-bold">Report Summary</h6>
+                <p class="text-muted small">Total Transactions: <strong>@Model.Orders.Count</strong></p>
+                <hr>
+                <button class="btn btn-outline-dark w-100 mb-2">Print Full Report</button>
+                <button class="btn btn-dark w-100">Review Refunds</button>
+            </div>
+        </div>
+    </div>
+</div>

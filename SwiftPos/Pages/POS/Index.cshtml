@@ -1,0 +1,62 @@
+﻿@page
+@model SwiftPOS.Pages.POS.IndexModel
+@{
+    ViewData["Title"] = "Billing";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="d-flex gap-2 mb-3 align-items-center">
+                <input type="text" id="pSearch" class="form-control" placeholder="Search products..." style="width: 300px;">
+                <div class="btn-group">
+                    <button class="btn btn-outline-secondary active">All</button>
+                    <button class="btn btn-outline-secondary">Coffee</button>
+                    <button class="btn btn-outline-secondary">Bakery</button>
+                </div>
+            </div>
+
+            <div class="row g-3" id="pList">
+                @foreach (var p in Model.Products)
+                {
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm h-100 text-center p-2"
+                             style="cursor:pointer;" onclick="addToCart('@p.Id', '@p.Name', @p.Price)">
+                            <img src="https://via.placeholder.com/150?text=@p.Name" class="card-img-top rounded mb-2">
+                            <h6 class="mb-0 text-truncate">@p.Name</h6>
+                            <small class="text-primary fw-bold">$@p.Price</small>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100 d-flex flex-column" style="min-height: 85vh;">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="fw-bold mb-0">Current Bill</h5>
+                    <input type="text" id="customerName" class="form-control form-control-sm mt-2" placeholder="Add customer name...">
+                </div>
+
+                <div class="card-body overflow-auto flex-grow-1" id="cartItems">
+                </div>
+
+                <div class="card-footer bg-white border-0 p-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal</span><span id="subTotal">$0.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Tax (8.5%)</span><span id="taxAmount">$0.00</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between h4 fw-bold">
+                        <span>Total</span><span id="grandTotal" class="text-primary">$0.00</span>
+                    </div>
+                    <button class="btn btn-dark w-100 btn-lg mt-3 rounded-pill" onclick="checkout()">
+                        <i class="bi bi-credit-card me-2"></i> Checkout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

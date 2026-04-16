@@ -1,0 +1,204 @@
+﻿@page
+@model SwiftPOS.Pages.DashboardModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<style>
+    :root {
+        --pos-teal: #005f73;
+        --pos-bg: #f8f9fc;
+        --card-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+    }
+
+    body {
+        background-color: var(--pos-bg);
+    }
+
+    .stat-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: var(--card-shadow);
+        transition: 0.3s;
+        background: white;
+    }
+
+    .chart-container {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: var(--card-shadow);
+    }
+
+    .badge-soft-success {
+        background-color: #e6f7f3;
+        color: #1cc88a;
+        padding: 5px 10px;
+        border-radius: 8px;
+        font-size: 0.8rem;
+    }
+
+    .table thead th {
+        border: none;
+        color: #858796;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+    }
+</style>
+
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center my-4">
+        <div>
+            <h4 class="fw-bold mb-0 text-teal">SwiftPOS Dashboard</h4>
+            <div class="input-group mt-2" style="width: 350px;">
+                <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control border-start-0 shadow-none" placeholder="Search analytics...">
+            </div>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <button class="btn btn-white shadow-sm border-0 rounded-circle"><i class="bi bi-bell"></i></button>
+            <div class="d-flex align-items-center gap-2">
+                <div class="text-end d-none d-sm-block">
+                    <p class="mb-0 small fw-bold">Admin User</p>
+                    <p class="mb-0 smaller text-muted" style="font-size: 0.7rem;">Store Manager</p>
+                </div>
+                <img src="https://ui-avatars.com/api/?name=Admin&background=005f73&color=fff" class="rounded-circle" width="40">
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card p-3">
+                <small class="text-muted fw-bold">TOTAL SALES</small>
+                <div class="d-flex align-items-center justify-content-between mt-2">
+                    <h3 class="fw-bold mb-0">@Model.TotalOrders.ToString("N0")</h3>
+                    <span class="badge badge-soft-success">+12.5%</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card p-3">
+                <small class="text-muted fw-bold">TOTAL REVENUE</small>
+                <div class="d-flex align-items-center justify-content-between mt-2">
+                    <h3 class="fw-bold mb-0">$@Model.Revenue.ToString("N2")</h3>
+                    <span class="badge badge-soft-success">+8.2%</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card p-3">
+                <small class="text-muted fw-bold">AVG. SALE VALUE</small>
+                <div class="d-flex align-items-center justify-content-between mt-2">
+                    <h3 class="fw-bold mb-0">$@((Model.TotalOrders > 0 ? Model.Revenue / Model.TotalOrders : 0).ToString("N2"))</h3>
+                    <span class="badge bg-light text-muted small border">Steady</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card p-3">
+                <small class="text-muted fw-bold">ACTIVE PRODUCTS</small>
+                <div class="d-flex align-items-center justify-content-between mt-2">
+                    <h3 class="fw-bold mb-0">@Model.ActiveProductsCount</h3>
+                    <small class="text-success fw-bold">Live</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-8">
+            <div class="chart-container">
+                <div class="d-flex justify-content-between mb-4">
+                    <h6 class="fw-bold mb-0">Sales Trend by Day</h6>
+                    <small class="text-muted">Last 7 Days</small>
+                </div>
+                <canvas id="salesTrendChart" height="280"></canvas>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="chart-container">
+                <h6 class="fw-bold mb-4">Sales by Category</h6>
+                <canvas id="categoryChart" height="280"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="card stat-card p-4 border-0 mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h6 class="fw-bold mb-0">Recent Transactions</h6>
+            <a href="/SalesHistory" class="text-decoration-none small fw-bold" style="color: var(--pos-teal);">View All <i class="bi bi-chevron-right"></i></a>
+        </div>
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>Transaction ID</th>
+                        <th>Customer</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var txn in Model.RecentTransactions)
+                    {
+                        <tr>
+                            <td class="text-teal fw-bold">#@txn.Id.Substring(Math.Max(0, txn.Id.Length - 8))</td>
+                            <td>@txn.CustomerName</td>
+                            <td class="fw-bold">$@txn.GrandTotal.ToString("N2")</td>
+                            <td><span class="badge badge-soft-success">SUCCESS</span></td>
+                            <td class="text-muted small">@txn.OrderDate.ToShortTimeString()</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Bar Chart Logic
+        new Chart(document.getElementById('salesTrendChart'), {
+            type: 'bar',
+            data: {
+                labels: ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'],
+                datasets: [{
+                    label: 'Sales ($)',
+                    data: [1200, 1900, 3000, 2200, 2500, 1500, 1100],
+                    backgroundColor: (ctx) => ctx.index === 2 ? '#005f73' : '#d1e3e7',
+                    borderRadius: 10,
+                    barThickness: 40
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { display: false }, ticks: { display: false } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // Doughnut Chart Logic
+        new Chart(document.getElementById('categoryChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Electronics', 'Apparel', 'Food', 'Other'],
+                datasets: [{
+                    data: [45, 25, 20, 10],
+                    backgroundColor: ['#005f73', '#0a9396', '#94d2bd', '#ee9b00'],
+                    borderWidth: 0,
+                    cutout: '75%'
+                }]
+            },
+            options: {
+                plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } } },
+                maintainAspectRatio: false
+            }
+        });
+    </script>
+}
