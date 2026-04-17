@@ -1,42 +1,67 @@
 ﻿@page
-@using SwiftPOS.Models
 @model SwiftPOS.Pages.Inventory.IndexModel
-<div class="card border-0 shadow-sm p-4">
-    <div class="d-flex justify-content-between mb-4">
+@{
+    ViewData["Title"] = "Inventory";
+}
+
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center my-4">
         <div>
-            <h3 class="fw-bold">Inventory Ledger</h3>
-            <p class="text-muted">Manage your stock levels with precision.</p>
+            <h4 class="fw-bold mb-0" style="color: #005f73;">Inventory Management</h4>
+            <p class="text-muted small">Manage your products and stock levels</p>
         </div>
-        <a asp-page="./Create" class="btn btn-primary">+ Add New Product</a>
+        <a href="/Inventory/Create" class="btn btn-primary shadow-sm rounded-pill px-4">
+            <i class="bi bi-plus-lg me-1"></i> Add Product
+        </a>
     </div>
 
-    <table class="table table-borderless align-middle">
-        <thead class="text-muted small border-bottom">
-            <tr>
-                <th>PRODUCT NAME</th><th>CATEGORY</th><th>PRICE</th><th>QUANTITY</th><th>STATUS</th><th>ACTIONS</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var p in Model.Products)
-            {
-                    <tr class="border-bottom">
-                        <td><div class="fw-bold">@p.Name</div></td>
-                        <td><span class="badge bg-light text-dark">@p.Category</span></td>
-                        <td>$@p.Price</td>
-                        <td>@(p is PhysicalProduct ph ? ph.StockQuantity : 0) units</td>
-                        <td>
-                        @if (p is PhysicalProduct ph2 && ph2.StockQuantity < 10)
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4 py-3 text-muted small">PRODUCT NAME</th>
+                            <th class="py-3 text-muted small">CATEGORY</th>
+                            <th class="py-3 text-muted small">PRICE</th>
+                            <th class="py-3 text-muted small">STATUS</th>
+                            <th class="text-end pe-4 py-3 text-muted small">ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Products.Count == 0)
                         {
-                                    <span class="badge bg-warning">Low Stock</span>
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">No products found in inventory.</td>
+                            </tr>
                         }
-                        else
+                        @foreach (var item in Model.Products)
                         {
-                                    <span class="badge bg-success">In Stock</span>
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="fw-bold">@item.Name</div>
+                                    <small class="text-muted">ID: @item.Id.Substring(Math.Max(0, item.Id.Length - 8))</small>
+                                </td>
+                                <td><span class="badge bg-light text-dark border">@item.Category</span></td>
+                                <td class="fw-bold">$@item.Price.ToString("N2")</td>
+                                <td><span class="badge bg-success-subtle text-success">In Stock</span></td>
+                                <td class="text-end pe-4">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary border-0 rounded-circle">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form method="post" asp-page-handler="Delete" asp-route-id="@item.Id" onsubmit="return confirm('Delete this product?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger border-0 rounded-circle">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
                         }
-                        </td>
-                        <td><i class="bi bi-three-dots-vertical"></i></td>
-                    </tr>
-            }
-        </tbody>
-    </table>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>

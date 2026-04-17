@@ -14,5 +14,8 @@ namespace SwiftPOS.Data
 
         public IMongoCollection<BaseProduct> Products => _db.GetCollection<BaseProduct>("Products");
         public IMongoCollection<Order> Orders => _db.GetCollection<Order>("Orders");
+
+        // MongoDbContext.cs ke andar ye line lazmi add karein:
+     
     }
 }

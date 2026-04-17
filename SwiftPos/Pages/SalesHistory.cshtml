@@ -4,112 +4,141 @@
     ViewData["Title"] = "Sales History";
 }
 
-<style>
-    .history-card { border: none; border-radius: 15px; background: white; box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1); }
-    .filter-box { background: white; border-radius: 10px; padding: 15px; border: 1px solid #eee; }
-    .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; fw-bold; }
-    .bg-soft-success { background: #e6f7f3; color: #1cc88a; }
-    .summary-banner { background: #005f73; color: white; border-radius: 15px; padding: 30px; position: relative; overflow: hidden; }
-    .summary-banner::after { content: ""; position: absolute; right: -20px; top: -20px; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%; }
-</style>
-
-<div class="container-fluid px-4">
-    <div class="d-flex justify-content-between align-items-center my-4">
+<div class="container-fluid px-4 py-3 bg-light min-vh-100">
+    <div class="d-flex justify-content-between align-items-start mb-4">
         <div>
-            <h3 class="fw-bold mb-0">Sales History</h3>
+            <h3 class="fw-bold text-dark mb-0">Sales History</h3>
             <p class="text-muted small">Reviewing transaction data for SwiftPOS</p>
         </div>
         <div class="d-flex gap-2">
-            <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-download me-1"></i> Export CSV</button>
-            <a href="/POS/Index" class="btn btn-dark btn-sm px-3">+ New Transaction</a>
+            <button class="btn btn-outline-secondary btn-sm rounded-2"><i class="bi bi-download me-1"></i> Export CSV</button>
+            <a href="/POS" class="btn btn-dark btn-sm rounded-2 px-3">+ New Transaction</a>
         </div>
     </div>
 
     <div class="row g-3 mb-4">
         <div class="col-md-3">
-            <label class="small fw-bold text-muted">DATE RANGE</label>
-            <select class="form-select border-0 shadow-sm mt-1">
+            <label class="small fw-bold text-muted text-uppercase mb-1">Date Range</label>
+            <select class="form-select border-0 shadow-sm rounded-3">
                 <option>Last 7 Days</option>
-                <option>This Month</option>
+                <option>Last 30 Days</option>
                 <option>Custom Range</option>
             </select>
         </div>
         <div class="col-md-3">
-            <label class="small fw-bold text-muted">PAYMENT STATUS</label>
-            <select class="form-select border-0 shadow-sm mt-1">
+            <label class="small fw-bold text-muted text-uppercase mb-1">Payment Status</label>
+            <select class="form-select border-0 shadow-sm rounded-3">
                 <option>All Statuses</option>
                 <option>Completed</option>
-                <option>Pending</option>
+                <option>Refunded</option>
             </select>
         </div>
         <div class="col-md-6">
-            <label class="small fw-bold text-muted">QUICK SEARCH</label>
-            <input type="text" class="form-control border-0 shadow-sm mt-1" placeholder="Order ID or Customer Name...">
+            <label class="small fw-bold text-muted text-uppercase mb-1">Quick Search</label>
+            <div class="input-group shadow-sm rounded-3 overflow-hidden">
+                <span class="input-group-text border-0 bg-white"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" class="form-control border-0" placeholder="Order ID or Customer Name...">
+            </div>
         </div>
     </div>
 
-    <div class="card history-card p-4 border-0 mb-4">
+    <div class="row g-4 mb-4">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm rounded-4 text-white overflow-hidden" style="background-color: #004654;">
+                <div class="card-body p-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="small text-uppercase fw-bold opacity-75 mb-1">Volume Overview</p>
+                        <h1 class="display-4 fw-bold mb-1">$@Model.TotalPeriodRevenue.ToString("N2")</h1>
+                        <p class="small mb-0 text-success-emphasis bg-white bg-opacity-10 d-inline-block px-2 py-1 rounded">
+                            <i class="bi bi-graph-up me-1"></i> 12.4% Daily Total Increase
+                        </p>
+                    </div>
+                    <div class="opacity-25 display-1">
+                        <i class="bi bi-bar-chart-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100 p-3">
+                <h6 class="fw-bold text-dark mb-3">Report Summary</h6>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted small">Total Transactions:</span>
+                    <span class="fw-bold">@Model.Orders.Count</span>
+                </div>
+                <hr class="text-muted opacity-25">
+                <button class="btn btn-light w-100 rounded-pill mb-2 fw-bold text-dark border">Print Full Report</button>
+                <button class="btn btn-dark w-100 rounded-pill fw-bold" style="background-color: #1b1e2b;">Review Refunds</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
         <div class="table-responsive">
-            <table class="table align-middle">
-                <thead class="text-muted small border-bottom">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-muted small text-uppercase fw-bold">
                     <tr>
-                        <th>TRANSACTION ID</th>
-                        <th>DATE & TIME</th>
-                        <th>CUSTOMER NAME</th>
-                        <th>TOTAL AMOUNT</th>
-                        <th>STATUS</th>
-                        <th>RECEIPT</th>
+                        <th class="px-4 py-3">Transaction ID</th>
+                        <th class="py-3">Date & Time</th>
+                        <th class="py-3">Customer Name</th>
+                        <th class="py-3">Total Amount</th>
+                        <th class="py-3">Status</th>
+                        <th class="px-4 py-3 text-end">Receipt</th>
                     </tr>
                 </thead>
                 <tbody>
+                    @if (Model.Orders.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">No sales history available.</td>
+                        </tr>
+                    }
                     @foreach (var order in Model.Orders)
                     {
                         <tr>
-                            <td class="fw-bold text-primary">#TRX-@order.Id.Substring(Math.Max(0, order.Id.Length - 5))</td>
+                            <td class="px-4">
+                                <span class="fw-bold text-primary">#TRX-@(order.Id?.Length > 8 ? order.Id.Substring(order.Id.Length - 8) : order.Id)</span>
+                            </td>
                             <td>
                                 <div class="fw-bold small">@order.OrderDate.ToString("MMM dd, yyyy")</div>
                                 <div class="text-muted smaller">@order.OrderDate.ToString("hh:mm tt")</div>
                             </td>
                             <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="bg-light rounded-circle p-2 small">@order.CustomerName.Substring(0, 1)</div>
-                                    <span>@order.CustomerName</span>
-                                </div>
+                                <span class="badge bg-light text-dark fw-normal p-2 border">
+                                    <i class="bi bi-person me-1"></i> @order.CustomerName
+                                </span>
                             </td>
                             <td class="fw-bold">$@order.GrandTotal.ToString("N2")</td>
-                            <td><span class="status-badge bg-soft-success fw-bold">COMPLETED</span></td>
-                            <td><button class="btn btn-sm btn-light border text-muted">View <i class="bi bi-file-earmark-text"></i></button></td>
+                            <td>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-2">Completed</span>
+                            </td>
+                            <td class="px-4 text-end">
+                                <button class="btn btn-sm btn-outline-dark rounded-circle"><i class="bi bi-printer"></i></button>
+                            </td>
                         </tr>
                     }
                 </tbody>
             </table>
         </div>
     </div>
-
-    <div class="row g-4 mb-4">
-        <div class="col-md-8">
-            <div class="summary-banner shadow-sm d-flex justify-content-between align-items-center">
-                <div>
-                    <p class="mb-1 text-uppercase small opacity-75">Volume Overview</p>
-                    <h1 class="fw-bold mb-0">$@Model.TotalPeriodRevenue.ToString("N2")</h1>
-                    <p class="mb-0 small mt-2"><i class="bi bi-graph-up-arrow text-info"></i> 12.4% Daily Total Increase</p>
-                </div>
-                <div class="d-flex align-items-end gap-2" style="height: 60px;">
-                    <div class="bg-white opacity-25" style="width:10px; height:40%;"></div>
-                    <div class="bg-white opacity-50" style="width:10px; height:70%;"></div>
-                    <div class="bg-white" style="width:10px; height:100%;"></div>
-                    <div class="bg-white opacity-25" style="width:10px; height:50%;"></div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card history-card p-4 h-100">
-                <h6 class="fw-bold">Report Summary</h6>
-                <p class="text-muted small">Total Transactions: <strong>@Model.Orders.Count</strong></p>
-                <hr>
-                <button class="btn btn-outline-dark w-100 mb-2">Print Full Report</button>
-                <button class="btn btn-dark w-100">Review Refunds</button>
-            </div>
-        </div>
-    </div>
 </div>
+
+<style>
+    .smaller {
+        font-size: 0.75rem;
+    }
+
+    .form-select, .form-control {
+        font-size: 0.9rem;
+    }
+
+        .form-select:focus, .form-control:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0,70,84,0.1);
+            border-color: transparent;
+        }
+
+    .text-primary {
+        color: #004654 !important;
+    }
+</style>

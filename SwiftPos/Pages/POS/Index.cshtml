@@ -1,62 +1,309 @@
 ﻿@page
 @model SwiftPOS.Pages.POS.IndexModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
 @{
-    ViewData["Title"] = "Billing";
+    ViewData["Title"] = "POS Terminal";
+    var token = Antiforgery.GetAndStoreTokens(HttpContext).RequestToken;
 }
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-8">
-            <div class="d-flex gap-2 mb-3 align-items-center">
-                <input type="text" id="pSearch" class="form-control" placeholder="Search products..." style="width: 300px;">
-                <div class="btn-group">
-                    <button class="btn btn-outline-secondary active">All</button>
-                    <button class="btn btn-outline-secondary">Coffee</button>
-                    <button class="btn btn-outline-secondary">Bakery</button>
+<input type="hidden" id="antiforgeryToken" value="@token">
+
+<div class="container-fluid pf-container">
+    <div class="row vh-100 overflow-hidden">
+
+        <div class="col-md-8 bg-light d-flex flex-column p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold text-dark m-0">Billing Terminal</h4>
+
+                <div class="category-wrapper">
+                    <button class="cat-pill active" onclick="filterCategory('All', this)">All Items</button>
+                    <button class="cat-pill" onclick="filterCategory('Food', this)">Food</button>
+                    <button class="cat-pill" onclick="filterCategory('Electronic', this)">Electronic</button>
+                    <button class="cat-pill" onclick="filterCategory('Grocery', this)">Grocery</button>
                 </div>
             </div>
 
-            <div class="row g-3" id="pList">
+            <div class="row g-3 flex-grow-1 overflow-auto pe-1" id="pList">
                 @foreach (var p in Model.Products)
                 {
-                    <div class="col-md-3">
-                        <div class="card border-0 shadow-sm h-100 text-center p-2"
-                             style="cursor:pointer;" onclick="addToCart('@p.Id', '@p.Name', @p.Price)">
-                            <img src="https://via.placeholder.com/150?text=@p.Name" class="card-img-top rounded mb-2">
-                            <h6 class="mb-0 text-truncate">@p.Name</h6>
-                            <small class="text-primary fw-bold">$@p.Price</small>
+                    <div class="col-md-3 pos-item" data-category="@p.Category">
+                        <div class="product-card" onclick="addToCart('@p.Id', '@p.Name', @p.Price)">
+                            <div class="icon-box">
+                                <i class="bi bi-box-seam"></i>
+                            </div>
+                            <h6 class="product-name">@p.Name</h6>
+                            <span class="product-price">$@p.Price.ToString("N2")</span>
                         </div>
                     </div>
                 }
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100 d-flex flex-column" style="min-height: 85vh;">
-                <div class="card-header bg-white border-0 py-3">
-                    <h5 class="fw-bold mb-0">Current Bill</h5>
-                    <input type="text" id="customerName" class="form-control form-control-sm mt-2" placeholder="Add customer name...">
+        <div class="col-md-4 bg-white shadow-lg d-flex flex-column p-4 cart-sidebar">
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+                <h5 class="fw-bold m-0 text-dark">Current Order</h5>
+                <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">LIVE</span>
+            </div>
+
+            <div class="mb-3">
+                <label class="small fw-bold text-muted mb-1">Customer Info</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-0"><i class="bi bi-person"></i></span>
+                    <input type="text" id="custName" class="form-control bg-light border-0 shadow-none" placeholder="Guest Customer">
+                </div>
+            </div>
+
+            <div id="cartItems" class="flex-grow-1 overflow-auto cart-items-list mb-3">
+                <div class="text-center text-muted mt-5 empty-msg">
+                    <i class="bi bi-cart3 display-4 d-block mb-3 opacity-25"></i>
+                    <p class="small">Scan products or click on cards to add items</p>
+                </div>
+            </div>
+
+            <div class="order-summary-box pt-3 border-top">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted small">Total Items</span>
+                    <span class="fw-bold" id="itemCount">0</span>
+                </div>
+                <div class="d-flex justify-content-between h3 fw-bold text-dark mb-4 mt-2">
+                    <span>Total</span>
+                    <span id="grandTotal" style="color: #005f73;">$0.00</span>
                 </div>
 
-                <div class="card-body overflow-auto flex-grow-1" id="cartItems">
-                </div>
-
-                <div class="card-footer bg-white border-0 p-4">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Subtotal</span><span id="subTotal">$0.00</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Tax (8.5%)</span><span id="taxAmount">$0.00</span>
-                    </div>
-                    <hr>
-                    <div class="d-flex justify-content-between h4 fw-bold">
-                        <span>Total</span><span id="grandTotal" class="text-primary">$0.00</span>
-                    </div>
-                    <button class="btn btn-dark w-100 btn-lg mt-3 rounded-pill" onclick="checkout()">
-                        <i class="bi bi-credit-card me-2"></i> Checkout
-                    </button>
-                </div>
+                <button class="btn btn-dark w-100 btn-checkout py-3 fw-bold rounded-4 shadow-sm" id="btnPlaceOrder" onclick="checkout()">
+                    <i class="bi bi-credit-card-2-back me-2"></i> COMPLETE BILLING
+                </button>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    /* Professional Styling for SwiftPOS UI */
+    .pf-container {
+        margin: 0;
+        padding: 0;
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* Category Pills */
+    .cat-pill {
+        border: none;
+        background: white;
+        padding: 8px 18px;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #6c757d;
+        margin-left: 8px;
+        transition: 0.3s;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+        .cat-pill.active {
+            background: #343a40;
+            color: white;
+        }
+
+        .cat-pill:hover:not(.active) {
+            background: #f1f1f1;
+        }
+
+    /* Product Cards */
+    .product-card {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        text-align: center;
+        transition: 0.25s;
+        cursor: pointer;
+        border: 1px solid transparent;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            border-color: #005f73;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        }
+
+    .icon-box {
+        width: 50px;
+        height: 50px;
+        background: #e6f7f8;
+        color: #005f73;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px;
+        font-size: 1.5rem;
+    }
+
+    .product-name {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .product-price {
+        color: #005f73;
+        font-weight: 800;
+        font-size: 1rem;
+    }
+
+    /* Cart Sidebar */
+    .cart-sidebar {
+        z-index: 1000;
+        border-left: 1px solid #eee;
+    }
+
+    .cart-item {
+        padding: 12px 0;
+        border-bottom: 1px solid #f8f9fa;
+        animation: slideIn 0.3s ease;
+    }
+
+    @@keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .btn-checkout {
+        background-color: #005f73 !important;
+        border-color: #005f73 !important;
+        transition: 0.3s;
+    }
+
+        .btn-checkout:hover {
+            background-color: #004654 !important;
+            transform: scale(1.02);
+        }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #ddd;
+        border-radius: 10px;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        let cart = [];
+        let total = 0;
+
+        function addToCart(id, name, price) {
+            const existingItem = cart.find(i => i.id === id);
+            if (existingItem) {
+                existingItem.qty++;
+            } else {
+                cart.push({ id, name, price, qty: 1 });
+            }
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cartItems');
+            const totalItemsLabel = document.getElementById('itemCount');
+            const grandTotalLabel = document.getElementById('grandTotal');
+
+            if (cart.length === 0) {
+                container.innerHTML = `<div class="text-center text-muted mt-5 empty-msg"><i class="bi bi-cart3 display-4 d-block mb-3 opacity-25"></i><p class="small">Scan products or click on cards to add items</p></div>`;
+                totalItemsLabel.innerText = "0";
+                grandTotalLabel.innerText = "$0.00";
+                total = 0;
+                return;
+            }
+
+            container.innerHTML = '';
+            total = 0;
+            let totalQty = 0;
+
+            cart.forEach((item, index) => {
+                total += (item.price * item.qty);
+                totalQty += item.qty;
+                container.innerHTML += `
+                            <div class="cart-item d-flex justify-content-between align-items-center">
+                                <div style="flex: 1;">
+                                    <h6 class="mb-0 fw-bold small">${item.name}</h6>
+                                    <small class="text-muted">$${item.price.toFixed(2)} x ${item.qty}</small>
+                                </div>
+                                <div class="text-end">
+                                    <div class="fw-bold text-dark mb-1 small">$${(item.price * item.qty).toFixed(2)}</div>
+                                    <button class="btn btn-sm text-danger p-0 border-0" onclick="removeItem(${index})"><i class="bi bi-trash"></i></button>
+                                </div>
+                            </div>`;
+            });
+
+            totalItemsLabel.innerText = totalQty;
+            grandTotalLabel.innerText = `$${total.toFixed(2)}`;
+        }
+
+        function removeItem(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        function filterCategory(cat, btn) {
+            document.querySelectorAll('.cat-pill').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.pos-item').forEach(item => {
+                item.style.display = (cat === 'All' || item.getAttribute('data-category') === cat) ? 'block' : 'none';
+            });
+        }
+
+        async function checkout() {
+            if (cart.length === 0) return alert("Cart is empty!");
+
+            const btn = document.getElementById('btnPlaceOrder');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+
+            const orderData = {
+                customerName: document.getElementById('custName').value || "Guest Customer",
+                grandTotal: parseFloat(total),
+                orderDate: new Date().toISOString(),
+                items: cart.map(i => ({ productId: i.id, productName: i.name, quantity: i.qty, unitPrice: i.price }))
+            };
+
+            try {
+                const response = await fetch('/POS/Index?handler=ProcessSale', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': document.getElementById('antiforgeryToken').value },
+                    body: JSON.stringify(orderData)
+                });
+
+                const res = await response.json();
+                if (res.success) {
+                    window.location.href = "/Dashboard";
+                } else {
+                    alert("Error: " + res.message);
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-credit-card-2-back me-2"></i> COMPLETE BILLING';
+                }
+            } catch (err) {
+                alert("Server Error!");
+                btn.disabled = false;
+            }
+        }
+    </script>
+}
