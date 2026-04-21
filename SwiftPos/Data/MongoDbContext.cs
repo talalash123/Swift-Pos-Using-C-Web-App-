@@ -1,5 +1,6 @@
 ﻿using MongoDB.Driver;
 using SwiftPOS.Models;
+using SwiftPOS.Pages.Settings;
 
 namespace SwiftPOS.Data
 {
@@ -16,6 +17,6 @@ namespace SwiftPOS.Data
         public IMongoCollection<Order> Orders => _db.GetCollection<Order>("Orders");
 
         // MongoDbContext.cs ke andar ye line lazmi add karein:
-     
+
     }
 }

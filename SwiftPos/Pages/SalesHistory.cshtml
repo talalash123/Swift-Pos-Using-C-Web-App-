@@ -4,116 +4,92 @@
     ViewData["Title"] = "Sales History";
 }
 
-<div class="container-fluid px-4 py-3 bg-light min-vh-100">
-    <div class="d-flex justify-content-between align-items-start mb-4">
+<div class="container-fluid px-4 py-4 min-vh-100" style="background-color: #f8fafc;">
+    <div class="d-flex justify-content-between align-items-center mb-4 no-print">
         <div>
             <h3 class="fw-bold text-dark mb-0">Sales History</h3>
-            <p class="text-muted small">Reviewing transaction data for SwiftPOS</p>
+            <p class="text-muted small">Comprehensive log of all store transactions</p>
         </div>
         <div class="d-flex gap-2">
-            <button class="btn btn-outline-secondary btn-sm rounded-2"><i class="bi bi-download me-1"></i> Export CSV</button>
-            <a href="/POS" class="btn btn-dark btn-sm rounded-2 px-3">+ New Transaction</a>
+            <a href="/POS" class="btn btn-dark btn-sm rounded-pill px-4 shadow-sm" style="background-color: #004654; border: none;">
+                <i class="bi bi-plus-lg me-1"></i> New Transaction
+            </a>
         </div>
     </div>
 
-    <div class="row g-3 mb-4">
-        <div class="col-md-3">
-            <label class="small fw-bold text-muted text-uppercase mb-1">Date Range</label>
-            <select class="form-select border-0 shadow-sm rounded-3">
-                <option>Last 7 Days</option>
-                <option>Last 30 Days</option>
-                <option>Custom Range</option>
-            </select>
-        </div>
-        <div class="col-md-3">
-            <label class="small fw-bold text-muted text-uppercase mb-1">Payment Status</label>
-            <select class="form-select border-0 shadow-sm rounded-3">
-                <option>All Statuses</option>
-                <option>Completed</option>
-                <option>Refunded</option>
-            </select>
-        </div>
+    <div class="row g-3 mb-4 no-print">
         <div class="col-md-6">
             <label class="small fw-bold text-muted text-uppercase mb-1">Quick Search</label>
-            <div class="input-group shadow-sm rounded-3 overflow-hidden">
-                <span class="input-group-text border-0 bg-white"><i class="bi bi-search text-muted"></i></span>
-                <input type="text" class="form-control border-0" placeholder="Order ID or Customer Name...">
+            <div class="input-group shadow-sm rounded-3 overflow-hidden border-0">
+                <span class="input-group-text border-0 bg-white pe-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" id="salesSearch" class="form-control border-0 py-2 ps-3"
+                       placeholder="Search Transaction ID or Customer..."
+                       onkeyup="filterSalesTable()">
             </div>
+        </div>
+        <div class="col-md-3">
+            <label class="small fw-bold text-muted text-uppercase mb-1">Date Range</label>
+            <select id="dateFilter" class="form-select border-0 shadow-sm rounded-3 py-2 small fw-semibold" onchange="filterSalesTable()">
+                <option value="all">All Time</option>
+                <option value="7">Last 7 Days</option>
+                <option value="30">Last 30 Days</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="small fw-bold text-muted text-uppercase mb-1">Status</label>
+            <select id="statusFilter" class="form-select border-0 shadow-sm rounded-3 py-2 small fw-semibold" onchange="filterSalesTable()">
+                <option value="all">All Statuses</option>
+                <option value="completed">Completed</option>
+                <option value="pending">Pending</option>
+                <option value="cancelled">Cancelled</option>
+            </select>
         </div>
     </div>
 
-    <div class="row g-4 mb-4">
-        <div class="col-md-8">
-            <div class="card border-0 shadow-sm rounded-4 text-white overflow-hidden" style="background-color: #004654;">
-                <div class="card-body p-4 d-flex justify-content-between align-items-center">
-                    <div>
-                        <p class="small text-uppercase fw-bold opacity-75 mb-1">Volume Overview</p>
-                        <h1 class="display-4 fw-bold mb-1">$@Model.TotalPeriodRevenue.ToString("N2")</h1>
-                        <p class="small mb-0 text-success-emphasis bg-white bg-opacity-10 d-inline-block px-2 py-1 rounded">
-                            <i class="bi bi-graph-up me-1"></i> 12.4% Daily Total Increase
-                        </p>
-                    </div>
-                    <div class="opacity-25 display-1">
-                        <i class="bi bi-bar-chart-fill"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm rounded-4 h-100 p-3">
-                <h6 class="fw-bold text-dark mb-3">Report Summary</h6>
-                <div class="d-flex justify-content-between mb-2">
-                    <span class="text-muted small">Total Transactions:</span>
-                    <span class="fw-bold">@Model.Orders.Count</span>
-                </div>
-                <hr class="text-muted opacity-25">
-                <button class="btn btn-light w-100 rounded-pill mb-2 fw-bold text-dark border">Print Full Report</button>
-                <button class="btn btn-dark w-100 rounded-pill fw-bold" style="background-color: #1b1e2b;">Review Refunds</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-5">
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="bg-light text-muted small text-uppercase fw-bold">
+            <table class="table table-hover align-middle mb-0" id="salesTable">
+                <thead class="text-muted small text-uppercase fw-bold" style="background-color: #f1f5f9;">
                     <tr>
-                        <th class="px-4 py-3">Transaction ID</th>
-                        <th class="py-3">Date & Time</th>
-                        <th class="py-3">Customer Name</th>
-                        <th class="py-3">Total Amount</th>
-                        <th class="py-3">Status</th>
-                        <th class="px-4 py-3 text-end">Receipt</th>
+                        <th class="px-4 py-3 border-0">Transaction ID</th>
+                        <th class="py-3 border-0">Date & Time</th>
+                        <th class="py-3 border-0">Customer</th>
+                        <th class="py-3 border-0">Total Amount</th>
+                        <th class="py-3 border-0">Status</th>
+                        <th class="px-4 py-3 text-end border-0">Action</th>
                     </tr>
                 </thead>
-                <tbody>
-                    @if (Model.Orders.Count == 0)
-                    {
-                        <tr>
-                            <td colspan="6" class="text-center py-5 text-muted">No sales history available.</td>
-                        </tr>
-                    }
+                <tbody class="bg-white">
                     @foreach (var order in Model.Orders)
                     {
-                        <tr>
-                            <td class="px-4">
-                                <span class="fw-bold text-primary">#TRX-@(order.Id?.Length > 8 ? order.Id.Substring(order.Id.Length - 8) : order.Id)</span>
-                            </td>
-                            <td>
-                                <div class="fw-bold small">@order.OrderDate.ToString("MMM dd, yyyy")</div>
-                                <div class="text-muted smaller">@order.OrderDate.ToString("hh:mm tt")</div>
-                            </td>
-                            <td>
-                                <span class="badge bg-light text-dark fw-normal p-2 border">
-                                    <i class="bi bi-person me-1"></i> @order.CustomerName
+                        <tr class="sales-row border-bottom">
+                            <td class="px-4 trx-id">
+                                <span class="fw-bold px-2 py-1 rounded bg-light text-primary small" style="font-family: monospace;">
+                                    #TRX-@(order.Id?.Substring(Math.Max(0, order.Id.Length - 8)))
                                 </span>
                             </td>
-                            <td class="fw-bold">$@order.GrandTotal.ToString("N2")</td>
-                            <td>
-                                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-2">Completed</span>
+                            <td class="order-date-cell">
+                                <div class="fw-bold small text-dark">@order.OrderDate.ToString("MMM dd, yyyy")</div>
+                                <div class="text-muted smaller">@order.OrderDate.ToString("hh:mm tt")</div>
+                            </td>
+                            <td class="cust-name">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 30px; height: 30px;">
+                                        <i class="bi bi-person small"></i>
+                                    </div>
+                                    <span class="small fw-semibold text-dark">@order.CustomerName</span>
+                                </div>
+                            </td>
+                            <td class="amount-cell"><span class="fw-bold text-dark">$@order.GrandTotal.ToString("N2")</span></td>
+                            <td class="status-cell">
+                                <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill fw-bold" style="font-size: 0.65rem;">
+                                    <i class="bi bi-check-circle-fill me-1"></i> COMPLETED
+                                </span>
                             </td>
                             <td class="px-4 text-end">
-                                <button class="btn btn-sm btn-outline-dark rounded-circle"><i class="bi bi-printer"></i></button>
+                                <button class="btn btn-sm btn-light border rounded-circle shadow-sm hover-dark" onclick="window.print()">
+                                    <i class="bi bi-printer"></i>
+                                </button>
                             </td>
                         </tr>
                     }
@@ -121,24 +97,124 @@
             </table>
         </div>
     </div>
+
+    <div class="row g-4">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm rounded-4 text-white overflow-hidden"
+                 style="background: linear-gradient(135deg, #004654 0%, #002d36 100%);">
+                <div class="card-body p-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="small text-uppercase fw-bold opacity-75 mb-1">Total Period Revenue</p>
+                        <h1 class="display-4 fw-bold mb-1" id="totalRevenueDisplay">$@Model.TotalPeriodRevenue.ToString("N2")</h1>
+                        <div class="badge bg-white bg-opacity-25 rounded-pill px-3 py-2 mt-2">
+                            <i class="bi bi-graph-up me-1"></i> Live Stats Overview
+                        </div>
+                    </div>
+                    <div class="opacity-25 d-none d-lg-block">
+                        <i class="bi bi-bar-chart-fill" style="font-size: 6rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100 p-4">
+                <h6 class="fw-bold text-dark mb-4">Report Summary</h6>
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted small">Transactions Found:</span>
+                    <span class="fw-bold text-dark" id="orderCount">@Model.Orders.Count</span>
+                </div>
+                <div class="d-flex justify-content-between mb-4">
+                    <span class="text-muted small">Server Status:</span>
+                    <span class="badge bg-success-subtle text-success rounded-pill px-2">Online</span>
+                </div>
+                <div class="d-grid gap-2 pt-2">
+                    <button class="btn btn-light border rounded-pill fw-bold text-dark py-2" onclick="window.print()">
+                        <i class="bi bi-printer me-2"></i> Print Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <style>
     .smaller {
-        font-size: 0.75rem;
+        font-size: 0.72rem;
     }
-
-    .form-select, .form-control {
-        font-size: 0.9rem;
-    }
-
-        .form-select:focus, .form-control:focus {
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(0,70,84,0.1);
-            border-color: transparent;
-        }
 
     .text-primary {
         color: #004654 !important;
     }
+
+    .sales-row {
+        transition: background-color 0.2s;
+    }
+
+        .sales-row:hover {
+            background-color: #f8fafc !important;
+        }
+
+    .hover-dark:hover {
+        background-color: #1b1e2b !important;
+        color: white !important;
+    }
+
+    @@media print {
+        .no-print, .btn, .input-group, label, select, .mb-4, nav {
+            display: none !important;
+        }
+
+        .card {
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        .bg-light {
+            background-color: white !important;
+        }
+    }
 </style>
+
+@section Scripts {
+    <script>
+        function filterSalesTable() {
+            let searchText = document.getElementById('salesSearch').value.toLowerCase();
+            let dateRange = document.getElementById('dateFilter').value;
+            let statusFilter = document.getElementById('statusFilter').value.toLowerCase();
+            let rows = document.querySelectorAll('.sales-row');
+
+            let count = 0;
+            let totalRevenue = 0;
+
+            rows.forEach(row => {
+                let id = row.querySelector('.trx-id').innerText.toLowerCase();
+                let name = row.querySelector('.cust-name').innerText.toLowerCase();
+                let statusText = row.querySelector('.status-cell').innerText.toLowerCase();
+                let amount = parseFloat(row.querySelector('.amount-cell').innerText.replace('$', '').replace(',', ''));
+
+                // Date logic
+                let orderDateText = row.querySelector('.order-date-cell .fw-bold').innerText;
+                let orderDate = new Date(orderDateText);
+                let today = new Date();
+                let diffTime = Math.abs(today - orderDate);
+                let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                // Filters
+                let matchesSearch = id.includes(searchText) || name.includes(searchText);
+                let matchesStatus = (statusFilter === "all") || statusText.includes(statusFilter);
+                let matchesDate = (dateRange === "all") || (diffDays <= parseInt(dateRange));
+
+                if (matchesSearch && matchesStatus && matchesDate) {
+                    row.style.display = "";
+                    count++;
+                    totalRevenue += amount;
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            document.getElementById('orderCount').innerText = count;
+            document.getElementById('totalRevenueDisplay').innerText = '$' + totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 });
+        }
+    </script>
+}

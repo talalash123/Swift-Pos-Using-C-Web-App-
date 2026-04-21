@@ -1,5 +1,4 @@
-﻿@* Pages/Shared/_Layout.cshtml *@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -7,67 +6,199 @@
     <title>SwiftPOS - Main Terminal</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+
     <style>
+        :root {
+            --sidebar-bg: #ffffff;
+            --primary-color: #005f73;
+            --active-bg: #e6f7f8;
+            --text-muted: #94a3b8;
+            --text-dark: #1e293b;
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8f9fc;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f1f5f9;
             margin: 0;
         }
 
+        /* --- MODERN SIDEBAR --- */
         .sidebar {
-            width: 260px;
+            width: 280px;
             height: 100vh;
-            background: white;
-            border-right: 1px solid #e3e6f0;
+            background: var(--sidebar-bg);
+            border-right: 1px dashed #e2e8f0;
             position: fixed;
-            padding: 20px;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.02);
+            z-index: 1000;
         }
 
-        .main-content {
-            margin-left: 260px;
-            padding: 30px;
+        /* Logo Area */
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 12px 30px;
+        }
+
+        .logo-box {
+            width: 35px;
+            height: 35px;
+            background: var(--primary-color);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        /* Nav Links */
+        .nav-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 800;
+            color: var(--text-muted);
+            margin: 20px 12px 10px;
         }
 
         .nav-link {
-            color: #858796;
+            color: #64748b;
             font-weight: 600;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 5px;
+            font-size: 0.95rem;
+            padding: 12px 16px;
+            border-radius: 14px;
+            margin-bottom: 4px;
             display: flex;
             align-items: center;
-            text-decoration: none;
+            transition: all 0.3s ease;
+            text-decoration: none !important;
         }
 
-            .nav-link:hover, .nav-link.active {
-                background: #f0f4f8;
-                color: #005f73;
+            .nav-link i {
+                font-size: 1.25rem;
+                margin-right: 14px;
+                transition: 0.3s;
             }
 
-            .nav-link i {
-                margin-right: 12px;
-                font-size: 1.2rem;
+            /* Active & Hover States */
+            .nav-link:hover {
+                background: #f8fafc;
+                color: var(--primary-color);
+                transform: translateX(5px);
             }
+
+            .nav-link.active {
+                background: var(--active-bg);
+                color: var(--primary-color);
+                position: relative;
+            }
+
+                .nav-link.active::after {
+                    content: '';
+                    position: absolute;
+                    right: 10px;
+                    width: 6px;
+                    height: 6px;
+                    background: var(--primary-color);
+                    border-radius: 50%;
+                }
+
+                .nav-link.active i {
+                    transform: scale(1.1);
+                }
+
+        /* Main Content Adjustment */
+        .main-content {
+            margin-left: 280px;
+            padding: 40px;
+            min-height: 100vh;
+        }
+
+        /* User Profile Mini Card */
+        .sidebar-footer {
+            margin-top: auto;
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: #005f73;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="p-3 mb-4">
-            <h4 class="fw-bold" style="color: #005f73;">SwiftPOS</h4>
+
+    <aside class="sidebar">
+        <div class="brand-logo">
+            <div class="logo-box">
+                <i class="bi bi-lightning-charge-fill"></i>
+            </div>
+            <h4 class="fw-bold m-0" style="color: var(--text-dark); letter-spacing: -1px;">SwiftPOS</h4>
         </div>
 
+        <div class="nav-label">Main Menu</div>
         <nav class="nav flex-column">
-            <a href="/Dashboard" class="nav-link active"><i class="bi bi-grid"></i> Dashboard</a>
-            <a href="/POS/Index" class="nav-link"><i class="bi bi-calculator"></i> POS Terminal</a>
-            <a href="/Inventory/Index" class="nav-link"><i class="bi bi-box-seam"></i> Inventory</a>
-            <a href="/SalesHistory" class="nav-link"><i class="bi bi-clock-history"></i> Sales History</a>
+            <a href="/Dashboard" class="nav-link active">
+                <i class="bi bi-grid-alt"></i> Dashboard
+            </a>
+            <a href="/POS/Index" class="nav-link">
+                <i class="bi bi-calculator"></i> POS Terminal
+            </a>
         </nav>
-    </div>
-    <div class="main-content">
+
+        <div class="nav-label">Management</div>
+        <nav class="nav flex-column">
+            <a href="/Inventory/Index" class="nav-link">
+                <i class="bi bi-box-seam"></i> Inventory
+            </a>
+            <a href="/SalesHistory" class="nav-link">
+                <i class="bi bi-receipt"></i> Sales History
+            </a>
+            <a href="/Settings" class="nav-link">
+                <i class="bi bi-gear"></i> Settings
+            </a>
+        </nav>
+
+    </aside>
+
+    <main class="main-content">
         @RenderBody()
-    </div>
+    </main>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> @await RenderSectionAsync("Scripts", required: false)
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        // Auto-active link logic based on URL
+        $(document).ready(function () {
+            var current = window.location.pathname;
+            $('.nav-link').each(function () {
+                var $this = $(this);
+                if ($this.attr('href') === current) {
+                    $('.nav-link').removeClass('active');
+                    $this.addClass('active');
+                }
+            });
+        });
+    </script>
 </body>
 </html>

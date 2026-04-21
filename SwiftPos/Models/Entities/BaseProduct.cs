@@ -11,11 +11,12 @@ namespace SwiftPOS.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; set; }
 
-        public string Name { get; set; } = "";
-        public string Category { get; set; } = "";
+        public string Name { get; set; }
+        public string Category { get; set; }
         public decimal Price { get; set; }
+        public string Type { get; set; }
 
-        // Naya field stock track karne ke liye
+        // Iska naam 'StockQuantity' hi hona chahiye
         public int StockQuantity { get; set; }
     }
 }

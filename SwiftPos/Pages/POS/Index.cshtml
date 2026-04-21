@@ -27,12 +27,26 @@
                 @foreach (var p in Model.Products)
                 {
                     <div class="col-md-3 pos-item" data-category="@p.Category">
-                        <div class="product-card" onclick="addToCart('@p.Id', '@p.Name', @p.Price)">
+                        <div class="product-card @(p.StockQuantity <= 0 ? "out-of-stock" : "")"
+                             onclick="@(p.StockQuantity > 0 ? $"addToCart('{p.Id}', '{p.Name}', {p.Price}, {p.StockQuantity})" : "")">
+
                             <div class="icon-box">
-                                <i class="bi bi-box-seam"></i>
+                                <i class="bi @(p.StockQuantity <= 0 ? "bi-exclamation-triangle text-danger" : "bi-box-seam")"></i>
                             </div>
+
                             <h6 class="product-name">@p.Name</h6>
                             <span class="product-price">$@p.Price.ToString("N2")</span>
+
+                            <div class="mt-2">
+                                @if (p.StockQuantity <= 0)
+                                {
+                                    <span class="badge bg-danger rounded-pill small">Sold Out</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-light text-muted border rounded-pill small">Stock: @p.StockQuantity</span>
+                                }
+                            </div>
                         </div>
                     </div>
                 }
@@ -56,7 +70,7 @@
             <div id="cartItems" class="flex-grow-1 overflow-auto cart-items-list mb-3">
                 <div class="text-center text-muted mt-5 empty-msg">
                     <i class="bi bi-cart3 display-4 d-block mb-3 opacity-25"></i>
-                    <p class="small">Scan products or click on cards to add items</p>
+                    <p class="small">Click on cards to add items</p>
                 </div>
             </div>
 
@@ -79,130 +93,108 @@
 </div>
 
 <style>
-    /* Professional Styling for SwiftPOS UI */
-    .pf-container {
-        margin: 0;
-        padding: 0;
-        font-family: 'Inter', sans-serif;
+    :root {
+        --primary-teal: #005f73;
+        --accent-orange: #fb8500;
+        --light-bg: #f4f7f6;
     }
 
-    /* Category Pills */
-    .cat-pill {
-        border: none;
-        background: white;
-        padding: 8px 18px;
-        border-radius: 50px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: #6c757d;
-        margin-left: 8px;
-        transition: 0.3s;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    /* Grid ko tight karne ke liye minmax 140px kiya */
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+        gap: 12px; /* Gaps mazeed kam */
+        padding: 10px;
     }
 
-        .cat-pill.active {
-            background: #343a40;
-            color: white;
-        }
-
-        .cat-pill:hover:not(.active) {
-            background: #f1f1f1;
-        }
-
-    /* Product Cards */
+    /* Card ka size chota aur compact */
     .product-card {
         background: white;
-        border-radius: 16px;
-        padding: 20px;
+        border-radius: 16px; /* Slightly less rounded for smaller size */
+        padding: 12px; /* Reduced padding */
         text-align: center;
-        transition: 0.25s;
-        cursor: pointer;
-        border: 1px solid transparent;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0,0,0,0.03);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 300px; /* Fixed height taaki alignment kharab na ho */
     }
 
-        .product-card:hover {
+        .product-card:hover:not(.out-of-stock) {
             transform: translateY(-5px);
-            border-color: #005f73;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.08);
+            border-color: var(--primary-teal);
         }
 
+    /* Icon box ko aur chota kiya */
     .icon-box {
-        width: 50px;
-        height: 50px;
-        background: #e6f7f8;
-        color: #005f73;
-        border-radius: 12px;
+        width: 40px;
+        height: 40px;
+        background: #f0f9fa;
+        color: var(--primary-teal);
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 15px;
-        font-size: 1.5rem;
+        margin: 0 auto 8px;
+        font-size: 1.2rem;
     }
 
+    /* Text size chota kiya taaki box chota lagay */
     .product-name {
-        font-size: 0.9rem;
-        font-weight: 700;
-        color: #333;
-        margin-bottom: 5px;
-        white-space: nowrap;
+        font-size: 1.0rem;
+        font-weight: 800;
+        color: #334155;
+        margin-bottom: 4px;
+        line-height: 1.2;
+        height: 2rem; /* Max 2 lines */
         overflow: hidden;
-        text-overflow: ellipsis;
     }
 
     .product-price {
-        color: #005f73;
+        color: var(--primary-teal);
         font-weight: 800;
-        font-size: 1rem;
+        font-size: 0.9rem;
+        margin-bottom: 5px;
     }
 
-    /* Cart Sidebar */
-    .cart-sidebar {
-        z-index: 1000;
-        border-left: 1px solid #eee;
+    .stock-badge {
+        font-size: 0.65rem;
+        background: #f8fafc;
+        color: #64748b;
+        padding: 2px 8px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
     }
 
-    .cart-item {
-        padding: 12px 0;
-        border-bottom: 1px solid #f8f9fa;
-        animation: slideIn 0.3s ease;
+    /* Sold Out Ribbon - mazeed compact */
+    .out-of-stock::after {
+        content: "SOLD OUT";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background: rgba(239, 68, 68, 0.85);
+        color: white;
+        font-size: 0.6rem;
+        font-weight: 800;
+        padding: 2px 0;
+        border-radius: 16px 16px 0 0; /* Card ke top par fix */
     }
 
-    @@keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateX(20px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
+    .out-of-stock {
+        opacity: 0.6;
+        filter: grayscale(1);
     }
 
+    /* Sidebar buttons aur search field ko bhi compact rakhein */
     .btn-checkout {
-        background-color: #005f73 !important;
-        border-color: #005f73 !important;
-        transition: 0.3s;
-    }
-
-        .btn-checkout:hover {
-            background-color: #004654 !important;
-            transform: scale(1.02);
-        }
-
-    /* Scrollbar Styling */
-    ::-webkit-scrollbar {
-        width: 4px;
-    }
-
-    ::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background: #ddd;
-        border-radius: 10px;
+        padding: 10px;
+        font-size: 0.9rem;
+        border-radius: 12px;
     }
 </style>
 
@@ -211,12 +203,18 @@
         let cart = [];
         let total = 0;
 
-        function addToCart(id, name, price) {
+        function addToCart(id, name, price, stock) {
             const existingItem = cart.find(i => i.id === id);
+
             if (existingItem) {
+                // Check agar cart mein quantity stock se zyada na ho jaye
+                if (existingItem.qty >= stock) {
+                    alert("Bas bhai! Itna hi stock bacha hai.");
+                    return;
+                }
                 existingItem.qty++;
             } else {
-                cart.push({ id, name, price, qty: 1 });
+                cart.push({ id, name, price, qty: 1, maxStock: stock });
             }
             updateCartUI();
         }
@@ -227,7 +225,7 @@
             const grandTotalLabel = document.getElementById('grandTotal');
 
             if (cart.length === 0) {
-                container.innerHTML = `<div class="text-center text-muted mt-5 empty-msg"><i class="bi bi-cart3 display-4 d-block mb-3 opacity-25"></i><p class="small">Scan products or click on cards to add items</p></div>`;
+                container.innerHTML = `<div class="text-center text-muted mt-5 empty-msg"><i class="bi bi-cart3 display-4 d-block mb-3 opacity-25"></i><p class="small">Click on cards to add items</p></div>`;
                 totalItemsLabel.innerText = "0";
                 grandTotalLabel.innerText = "$0.00";
                 total = 0;
@@ -272,7 +270,7 @@
         }
 
         async function checkout() {
-            if (cart.length === 0) return alert("Cart is empty!");
+            if (cart.length === 0) return alert("Cart khali hai!");
 
             const btn = document.getElementById('btnPlaceOrder');
             btn.disabled = true;
@@ -282,19 +280,28 @@
                 customerName: document.getElementById('custName').value || "Guest Customer",
                 grandTotal: parseFloat(total),
                 orderDate: new Date().toISOString(),
-                items: cart.map(i => ({ productId: i.id, productName: i.name, quantity: i.qty, unitPrice: i.price }))
+                items: cart.map(i => ({
+                    productId: i.id,
+                    productName: i.name,
+                    quantity: i.qty,
+                    unitPrice: i.price
+                }))
             };
 
             try {
                 const response = await fetch('/POS/Index?handler=ProcessSale', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': document.getElementById('antiforgeryToken').value },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.getElementById('antiforgeryToken').value
+                    },
                     body: JSON.stringify(orderData)
                 });
 
                 const res = await response.json();
                 if (res.success) {
-                    window.location.href = "/Dashboard";
+                    // Success ke baad Sales History par bhej dein
+                    window.location.href = "/SalesHistory";
                 } else {
                     alert("Error: " + res.message);
                     btn.disabled = false;
@@ -303,6 +310,7 @@
             } catch (err) {
                 alert("Server Error!");
                 btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-credit-card-2-back me-2"></i> COMPLETE BILLING';
             }
         }
     </script>

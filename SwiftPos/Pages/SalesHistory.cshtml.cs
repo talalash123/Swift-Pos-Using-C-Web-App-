@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MongoDB.Driver;
 using SwiftPOS.Data;
@@ -14,23 +15,33 @@ namespace SwiftPOS.Pages
             _context = context;
         }
 
-        // List ka naam 'Orders' rakha hai taaki frontend loop error na de
         public List<Order> Orders { get; set; } = new();
         public decimal TotalPeriodRevenue { get; set; }
 
+        // Is property ka hona zaroori hai search ke liye
+        [BindProperty(SupportsGet = true)]
+        public string? SearchTerm { get; set; }
+
         public async Task OnGetAsync()
         {
-            // Database se saare orders fetch karna aur latest ko top par rakhna
+            var filterBuilder = Builders<Order>.Filter;
+            var filter = filterBuilder.Empty;
+
+            if (!string.IsNullOrWhiteSpace(SearchTerm))
+            {
+                // Regex search jo name aur ID dono ko check karegi (Case-Insensitive)
+                filter = filterBuilder.Or(
+                    filterBuilder.Regex(o => o.CustomerName, new MongoDB.Bson.BsonRegularExpression(SearchTerm, "i")),
+                    filterBuilder.Regex(o => o.Id, new MongoDB.Bson.BsonRegularExpression(SearchTerm, "i"))
+                );
+            }
+
             Orders = await _context.Orders
-                .Find(_ => true)
+                .Find(filter)
                 .SortByDescending(o => o.OrderDate)
                 .ToListAsync();
 
-            // Total revenue calculate karna overview card ke liye
-            if (Orders != null)
-            {
-                TotalPeriodRevenue = Orders.Sum(o => o.GrandTotal);
-            }
+            TotalPeriodRevenue = Orders.Sum(o => o.GrandTotal);
         }
     }
 }

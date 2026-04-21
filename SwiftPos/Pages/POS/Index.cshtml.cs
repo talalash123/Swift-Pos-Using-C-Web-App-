@@ -15,37 +15,44 @@ namespace SwiftPOS.Pages.POS
             _context = context;
         }
 
-        // List to display products on the terminal
         public List<BaseProduct> Products { get; set; } = new();
 
         public async Task OnGetAsync()
         {
-            // Database se products uthana taaki terminal pe show hon
+            // Database se products uthana
             Products = await _context.Products.Find(_ => true).ToListAsync();
         }
 
-        // AJAX handler jo order save karta hai
         public async Task<IActionResult> OnPostProcessSaleAsync([FromBody] Order orderData)
         {
-            if (orderData == null)
+            if (orderData == null || orderData.Items == null || !orderData.Items.Any())
             {
-                return new JsonResult(new { success = false, message = "Empty order data received." });
+                return new JsonResult(new { success = false, message = "Cart is empty." });
             }
 
             try
             {
-                // Order details finalize karna
-                orderData.OrderDate = DateTime.Now; // Server time set karein
+                orderData.OrderDate = DateTime.Now;
 
-                // MongoDB mein 'Orders' collection mein insert karna
+                // 1. Pehle Order save karein
                 await _context.Orders.InsertOneAsync(orderData);
 
-                return new JsonResult(new { success = true, message = "Order saved successfully!" });
+                // 2. Har item ki quantity database mein minus karein
+                foreach (var item in orderData.Items)
+                {
+                    var filter = Builders<BaseProduct>.Filter.Eq(p => p.Id, item.ProductId);
+
+                    // Database mein jo value hai usme se item.Quantity minus ho jayegi
+                    var update = Builders<BaseProduct>.Update.Inc(p => p.StockQuantity, -item.Quantity);
+
+                    await _context.Products.UpdateOneAsync(filter, update);
+                }
+
+                return new JsonResult(new { success = true, message = "Success!" });
             }
             catch (Exception ex)
             {
-                // Agar koi error aaye to console ya frontend pe return karein
-                return new JsonResult(new { success = false, message = "Database Error: " + ex.Message });
+                return new JsonResult(new { success = false, message = "DB Error: " + ex.Message });
             }
         }
     }

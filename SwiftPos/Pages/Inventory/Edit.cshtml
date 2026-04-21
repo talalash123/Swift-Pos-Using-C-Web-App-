@@ -4,43 +4,152 @@
     ViewData["Title"] = "Edit Product";
 }
 
+<style>
+    .edit-card {
+        border-radius: 24px;
+        background: #ffffff;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+        border: none;
+    }
+
+    .form-label {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin-bottom: 6px;
+    }
+
+    .input-group-text {
+        background-color: #f8fafc;
+        border-right: none;
+        color: #94a3b8;
+        border-radius: 12px 0 0 12px;
+    }
+
+    .form-control, .form-select {
+        border-radius: 12px;
+        padding: 10px 15px;
+        border: 1px solid #e2e8f0;
+        font-size: 0.95rem;
+    }
+
+        .form-control:focus {
+            border-color: #005f73;
+            box-shadow: 0 0 0 3px rgba(0, 95, 115, 0.1);
+        }
+
+    .header-icon {
+        width: 45px;
+        height: 45px;
+        background: #fff7ed;
+        color: #fb8500;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+</style>
+
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow border-0 rounded-4">
-                <div class="card-body p-4">
-                    <h4 class="fw-bold mb-4">Edit Product</h4>
+        <div class="col-md-7 col-lg-6">
 
-                    <form method="post">
-                        <input type="hidden" asp-for="Product.Id" />
+            <div class="mb-3">
+                <a asp-page="./Index" class="text-decoration-none text-muted small fw-bold">
+                    <i class="bi bi-chevron-left"></i> Back to Inventory
+                </a>
+            </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Product Name</label>
-                            <input asp-for="Product.Name" class="form-control" required />
+            <div class="card edit-card p-4">
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <div class="header-icon"><i class="bi bi-pencil-square"></i></div>
+                    <div>
+                        <h4 class="fw-bold mb-0" style="color: #334155;">Edit Product</h4>
+                        <p class="text-muted small mb-0">Update your product details</p>
+                    </div>
+                </div>
+
+                <form method="post">
+                    <input type="hidden" asp-for="Product.Id" />
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Product Name</label>
+                        <input asp-for="Product.Name" class="form-control shadow-none" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Category</label>
+                        <select asp-for="Product.Category" class="form-select shadow-none" required>
+                            <option value="Food">Food</option>
+                            <option value="Electronic">Electronic</option>
+                            <option value="Crockery">Crockery</option>
+                            <option value="Grocery">Grocery</option>
+                        </select>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Price ($)</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-tag"></i></span>
+                                <input asp-for="Product.Price" type="number" step="0.01" class="form-control shadow-none" style="border-radius: 0 12px 12px 0;" required />
+                            </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Category</label>
-                            <select asp-for="Product.Category" class="form-select" required>
-                                <option value="Food">Food</option>
-                                <option value="Electronic">Electronic</option>
-                                <option value="Crockery">Crockery</option>
-                                <option value="Grocery">Grocery</option>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Product Type</label>
+                            @* Product.Type field yahan add ki gayi hai *@
+                            <select asp-for="Product.Type" class="form-select shadow-none" onchange="toggleStockDiv(this.value)">
+                                <option value="Physical">📦 Physical Item</option>
+                                <option value="Service">🛠️ Service</option>
                             </select>
                         </div>
+                    </div>
 
-                        <div class="mb-4">
-                            <label class="form-label">Price ($)</label>
-                            <input asp-for="Product.Price" type="number" step="0.01" class="form-control" required />
+                    @* Stock Level Div: Service par hide ho jayega *@
+                    <div class="mb-4" id="sDiv" style="@(Model.Product.Type == "Service" ? "display:none;" : "display:block;")">
+                        <div class="p-3 bg-light rounded-4 border">
+                            <label class="form-label fw-bold">Current Stock Level</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-stack"></i></span>
+                                <input asp-for="Product.StockQuantity" type="number" class="form-control shadow-none" style="border-radius: 0 12px 12px 0;" min="0" />
+                            </div>
                         </div>
+                    </div>
 
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-bold">Update Changes</button>
-                            <a asp-page="./Index" class="btn btn-light border w-100 rounded-pill py-2 fw-bold">Cancel</a>
+                    <div class="row g-2 mt-3">
+                        <div class="col-8">
+                            <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow-sm" style="background-color: #005f73; border: none;">
+                                <i class="bi bi-check-lg me-1"></i> Update Changes
+                            </button>
                         </div>
-                    </form>
-                </div>
+                        <div class="col-4">
+                            <a asp-page="./Index" class="btn btn-light border w-100 rounded-pill py-2 fw-bold text-muted text-decoration-none text-center">
+                                Cancel
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="mt-4 p-3 bg-white rounded-4 shadow-sm d-flex justify-content-between align-items-center border">
+                <form method="post" asp-page-handler="Delete" asp-route-id="@Model.Product.Id">
+                    <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3" onclick="return confirm('Are you sure?');">
+                        Delete Product
+                    </button>
+                </form>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    function toggleStockDiv(val) {
+        const sDiv = document.getElementById('sDiv');
+        if (val === 'Service') {
+            sDiv.style.display = 'none';
+        } else {
+            sDiv.style.display = 'block';
+        }
+    }
+</script>

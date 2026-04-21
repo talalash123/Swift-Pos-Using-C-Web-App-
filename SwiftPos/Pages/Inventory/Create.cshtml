@@ -1,29 +1,150 @@
 ﻿@page
 @model SwiftPOS.Pages.Inventory.CreateModel
-<div class="card shadow-sm border-0 p-4">
-    <h3>Add New Product</h3>
-    <form method="post">
-        <div class="mb-3">
-            <label>Name</label><input asp-for="Name" class="form-control" required />
-        </div>
-        <div class="mb-3">
-            <label>Category</label><input asp-for="Category" class="form-control" required />
-        </div>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label>Price</label><input asp-for="Price" type="number" step="0.01" class="form-control" required />
+@{
+    ViewData["Title"] = "Add New Product";
+}
+
+<style>
+    .create-card {
+        border-radius: 24px;
+        background: #ffffff;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+        border: none;
+    }
+
+    .form-label {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin-bottom: 6px;
+    }
+
+    .input-group-text {
+        background-color: #f8fafc;
+        border-right: none;
+        color: #94a3b8;
+        border-radius: 12px 0 0 12px;
+    }
+
+    .form-control, .form-select {
+        border-radius: 12px;
+        padding: 10px 15px;
+        border: 1px solid #e2e8f0;
+        font-size: 0.95rem;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #005f73;
+            box-shadow: 0 0 0 3px rgba(0, 95, 115, 0.1);
+        }
+
+    /* Icon box beside the heading */
+    .header-icon {
+        width: 45px;
+        height: 45px;
+        background: #e6f7f8;
+        color: #005f73;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+</style>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+
+            <div class="mb-3">
+                <a asp-page="./Index" class="text-decoration-none text-muted small fw-bold">
+                    <i class="bi bi-chevron-left"></i> Back to Inventory
+                </a>
             </div>
-            <div class="col-md-6 mb-3">
-                <label>Type</label>
-                <select asp-for="SelectedType" class="form-select" onchange="document.getElementById('sDiv').style.display = this.value=='Service'?'none':'block'">
-                    <option value="Physical">Physical</option>
-                    <option value="Service">Service</option>
-                </select>
+
+            <div class="card create-card p-4">
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <div class="header-icon">
+                        <i class="bi bi-plus-circle-fill"></i>
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-0" style="color: #005f73;">Add New Product</h4>
+                        <p class="text-muted small mb-0">Fill in the details to expand your catalog</p>
+                    </div>
+                </div>
+
+                <form method="post">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Product Name</label>
+                        <input asp-for="Name" class="form-control shadow-none" placeholder="e.g. Wireless Mouse" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Category</label>
+                        <select asp-for="Category" class="form-select shadow-none" required>
+                            <option value="">Select a category</option>
+                            <option value="Food">Food</option>
+                            <option value="Electronic">Electronic</option>
+                            <option value="Crockery">Crockery</option>
+                            <option value="Grocery">Grocery</option>
+                        </select>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Price ($)</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-tag"></i></span>
+                                <input asp-for="Price" type="number" step="0.01" class="form-control shadow-none" style="border-radius: 0 12px 12px 0;" placeholder="0.00" required />
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Product Type</label>
+                            <select asp-for="SelectedType" class="form-select shadow-none" onchange="toggleStockDiv(this.value)">
+                                <option value="Physical">📦 Physical Item</option>
+                                <option value="Service">🛠️ Service</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-4 animate__animated animate__fadeIn" id="sDiv">
+                        <div class="p-3 bg-light rounded-4 border-dashed border">
+                            <label class="form-label fw-bold">Initial Stock Level</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-stack"></i></span>
+                                <input asp-for="Stock" type="number" class="form-control shadow-none" style="border-radius: 0 12px 12px 0;" placeholder="Quantity on hand" min="0" />
+                            </div>
+                            <div class="form-text mt-1 text-xs">Set the starting inventory for this product.</div>
+                        </div>
+                    </div>
+
+                    <div class="row g-2 mt-2">
+                        <div class="col-8">
+                            <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow-sm" style="background-color: #005f73; border: none;">
+                                <i class="bi bi-check-lg me-1"></i> Confirm & Save
+                            </button>
+                        </div>
+                        <div class="col-4">
+                            <a asp-page="./Index" class="btn btn-light border w-100 rounded-pill py-2 fw-bold text-muted">
+                                Cancel
+                            </a>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
-        <div class="mb-3" id="sDiv">
-            <label>Stock</label><input asp-for="Stock" type="number" class="form-control" />
-        </div>
-        <button type="submit" class="btn btn-primary">Save Product</button>
-    </form>
+    </div>
 </div>
+
+<script>
+    function toggleStockDiv(val) {
+        const sDiv = document.getElementById('sDiv');
+        if (val === 'Service') {
+            sDiv.style.opacity = '0';
+            setTimeout(() => { sDiv.style.display = 'none'; }, 200);
+        } else {
+            sDiv.style.display = 'block';
+            setTimeout(() => { sDiv.style.opacity = '1'; }, 10);
+        }
+    }
+</script>

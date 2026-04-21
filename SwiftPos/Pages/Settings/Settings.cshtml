@@ -1,0 +1,158 @@
+﻿@page "/Settings"
+@model SwiftPOS.Pages.Settings.SettingsModel
+@{
+    ViewData["Title"] = "Settings";
+}
+
+<style>
+    .settings-card {
+        border-radius: 20px;
+        background: #ffffff;
+        border: 1px solid #f1f5f9;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.02);
+        transition: all 0.3s ease;
+    }
+
+        .settings-card:hover {
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+        }
+
+    .icon-circle {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        margin-bottom: 15px;
+    }
+
+    .btn-save {
+        background: #005f73;
+        color: white;
+        border: none;
+        padding: 10px 30px;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+
+        .btn-save:hover {
+            background: #0a9396;
+            transform: translateY(-2px);
+            color: white;
+        }
+
+    .status-dot {
+        height: 10px;
+        width: 10px;
+        background-color: #22c55e;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 5px;
+    }
+</style>
+
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h3 class="fw-bold text-dark m-0">Settings</h3>
+            <p class="text-muted small">Manage your terminal configuration and system preferences</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-8">
+            <div class="settings-card p-4 h-100">
+                <div class="icon-circle bg-primary-subtle text-primary">
+                    <i class="bi bi-shop"></i>
+                </div>
+                <h5 class="fw-bold mb-4">Store Profile</h5>
+                <form method="post">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted">Store Name</label>
+                            <input type="text" class="form-control rounded-3 border-light-subtle shadow-sm p-2" placeholder="SwiftPOS Main Branch">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted">Branch Code</label>
+                            <input type="text" class="form-control rounded-3 border-light-subtle shadow-sm p-2" placeholder="ST-001" readonly>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold text-muted">Store Address</label>
+                            <textarea class="form-control rounded-3 border-light-subtle shadow-sm p-2" rows="2" placeholder="Enter store location..."></textarea>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-save shadow-sm">Save Profile</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="settings-card p-4 h-100 bg-light">
+                <div class="icon-circle bg-success-subtle text-success">
+                    <i class="bi bi-activity"></i>
+                </div>
+                <h5 class="fw-bold mb-3">System Status</h5>
+                <ul class="list-group list-group-flush bg-transparent">
+                    <li class="list-group-item bg-transparent px-0 py-3 border-light d-flex justify-content-between">
+                        <span class="small text-muted">Database</span>
+                        <span class="small fw-bold"><span class="status-dot"></span> MongoDB Online</span>
+                    </li>
+                    <li class="list-group-item bg-transparent px-0 py-3 border-light d-flex justify-content-between">
+                        <span class="small text-muted">Cloud Backup</span>
+                        <span class="small fw-bold text-primary">Auto-Syncing</span>
+                    </li>
+                    <li class="list-group-item bg-transparent px-0 py-3 border-0 d-flex justify-content-between">
+                        <span class="small text-muted">Last Update</span>
+                        <span class="small fw-bold">21 April 2026</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <div class="settings-card p-4">
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <div class="icon-circle bg-warning-subtle text-warning mb-0">
+                        <i class="bi bi-cpu"></i>
+                    </div>
+                    <h5 class="fw-bold m-0">Hardware Configuration</h5>
+                </div>
+                <div class="row g-3 text-center">
+                    <div class="col-md-3">
+                        <div class="p-3 border rounded-4 bg-white">
+                            <i class="bi bi-printer fs-3 text-muted mb-2 d-block"></i>
+                            <span class="d-block small fw-bold">Thermal Printer</span>
+                            <span class="extra-small text-success">Ready</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 border rounded-4 bg-white">
+                            <i class="bi bi-qr-code-scan fs-3 text-muted mb-2 d-block"></i>
+                            <span class="d-block small fw-bold">Scanner</span>
+                            <span class="extra-small text-muted">Not Found</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 border rounded-4 bg-white">
+                            <i class="bi bi-cash-stack fs-3 text-muted mb-2 d-block"></i>
+                            <span class="d-block small fw-bold">Cash Drawer</span>
+                            <span class="extra-small text-success">Connected</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 border rounded-4 bg-white">
+                            <i class="bi bi-wifi fs-3 text-muted mb-2 d-block"></i>
+                            <span class="d-block small fw-bold">Network</span>
+                            <span class="extra-small text-success">Stable</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
