@@ -4,7 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // 1. Add Razor Pages with NewtonsoftJson support
 builder.Services.AddRazorPages()
-    .AddNewtonsoftJson(); // Ab ye error nahi dega package install hone ke baad
+    .AddNewtonsoftJson();
 
 // 2. Register MongoDB Context
 builder.Services.AddSingleton<MongoDbContext>();
@@ -24,6 +24,12 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+
+// --- REDIRECT LOGIC: Root (/) ko Dashboard par bhejne ke liye ---
+app.MapGet("/", context => {
+    context.Response.Redirect("/Dashboard");
+    return Task.CompletedTask;
+});
 
 app.MapRazorPages();
 

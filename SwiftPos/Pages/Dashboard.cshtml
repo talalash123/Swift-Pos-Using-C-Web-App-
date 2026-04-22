@@ -6,93 +6,160 @@
 
 <style>
     :root {
-        --pos-primary: #005f73;
+        --pos-primary: #004654; /* Darker teal for better contrast */
         --pos-secondary: #0a9396;
-        --pos-bg: #f8f9fc;
-        --card-shadow: 0 4px 20px 0 rgba(0,0,0,0.05);
+        --pos-accent: #94d2bd;
+        --pos-bg: #f4f7f6;
+        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+        --glass-bg: rgba(255, 255, 255, 0.95);
     }
 
     body {
         background-color: var(--pos-bg);
-        font-family: 'Inter', 'Segoe UI', sans-serif;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        color: #2d3436;
     }
 
-    /* Stats Cards Styling */
-    .stat-card {
-        border: none;
-        border-radius: 16px;
-        box-shadow: var(--card-shadow);
-        transition: transform 0.2s ease;
-        background: #fff;
-        overflow: hidden;
-    }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-
-    .stat-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-    }
-
-    /* Chart & Table Containers */
-    .content-box {
-        background: #fff;
-        border-radius: 16px;
-        padding: 24px;
-        box-shadow: var(--card-shadow);
-        border: none;
-        height: 100%;
-    }
-
-    .table thead th {
-        background-color: #f8f9fa;
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 0.5px;
-        font-weight: 700;
-        color: #6c757d;
-        border: none;
-        padding: 15px;
-    }
-
-    .table tbody td {
-        padding: 15px;
-        border-bottom: 1px solid #f1f1f1;
-    }
-
-    .badge-status {
-        padding: 6px 12px;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 0.75rem;
-    }
-
-    .bg-soft-teal {
-        background-color: #e6f7f8;
+    /* Page Heading Enhancement */
+    h3.fw-bold {
+        letter-spacing: -0.5px;
         color: var(--pos-primary);
     }
 
+    /* Modern Stats Cards */
+    .stat-card {
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        border-radius: 20px;
+        box-shadow: var(--card-shadow);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: var(--glass-bg);
+        position: relative;
+        z-index: 1;
+    }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+            border-color: var(--pos-secondary);
+        }
+
+    /* Icon Background Gradients */
+    .stat-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover .stat-icon {
+        transform: scale(1.1) rotate(-5deg);
+    }
+
+    /* Content Box (Charts/Tables) */
+    .content-box {
+        background: #fff;
+        border-radius: 24px;
+        padding: 28px;
+        box-shadow: var(--card-shadow);
+        border: 1px solid rgba(0,0,0,0.02);
+        height: 100%;
+    }
+
+    /* Table Styling */
+    .table-container {
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .table thead th {
+        background-color: #fcfdfe;
+        text-transform: uppercase;
+        font-size: 0.7rem;
+        letter-spacing: 1px;
+        font-weight: 800;
+        color: #a0aec0;
+        border-bottom: 2px solid #f7fafc;
+        padding: 20px 15px;
+    }
+
+    .table tbody td {
+        padding: 18px 15px;
+        vertical-align: middle;
+        font-size: 0.9rem;
+        border-bottom: 1px solid #f7fafc;
+        transition: background 0.2s;
+    }
+
+    .table tbody tr:hover td {
+        background-color: #fbfcfd;
+    }
+
+    .live-dot {
+        height: 8px;
+        width: 8px;
+        background-color: #2ec4b6;
+        border-radius: 50%;
+        display: inline-block;
+        animation: blink 1.5s infinite;
+    }
+
+    @@keyframes blink {
+        0% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 0.4;
+            transform: scale(1.2);
+        }
+
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+    /* New Soft Color Palette */
+    .bg-soft-teal {
+        background: linear-gradient(135deg, #e6f7f8 0%, #b2e2e5 100%);
+        color: #005f73;
+    }
+
     .bg-soft-green {
-        background-color: #e8f5e9;
-        color: #2e7d32;
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        color: #1b5e20;
     }
 
     .bg-soft-orange {
-        background-color: #fff3e0;
-        color: #ef6c00;
+        background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+        color: #e65100;
     }
 
     .bg-soft-purple {
-        background-color: #f3e5f5;
-        color: #7b1fa2;
+        background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+        color: #4a148c;
     }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #cbd5e0;
+        border-radius: 10px;
+    }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
 </style>
 
 <div class="container-fluid px-4">
@@ -241,13 +308,13 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // C# data transfer to JavaScript
+        // 1. DATA FROM SERVER (For Sales Chart)
         const chartLabels = @Html.Raw(Json.Serialize(Model.ChartLabels));
         const chartValues = @Html.Raw(Json.Serialize(Model.ChartData));
 
-        // Sales Bar Chart
+        // 2. INITIALIZE SALES BAR CHART (Server-side data)
         const salesCtx = document.getElementById('salesTrendChart').getContext('2d');
-        new Chart(salesCtx, {
+        const salesChart = new Chart(salesCtx, {
             type: 'bar',
             data: {
                 labels: chartLabels,
@@ -270,16 +337,15 @@
             }
         });
 
-        // Stock Doughnut Chart
+        // 3. INITIALIZE STOCK DOUGHNUT CHART (Empty first, then live update)
         const stockCtx = document.getElementById('stockDoughnutChart').getContext('2d');
-        new Chart(stockCtx, {
+        let stockChart = new Chart(stockCtx, {
             type: 'doughnut',
             data: {
                 labels: ['In Stock', 'Low Stock', 'Out of Stock'],
                 datasets: [{
-                    data: [65, 20, 15],
+                    data: [0, 0, 0],
                     backgroundColor: ['#005f73', '#ee9b00', '#ae2012'],
-                    hoverOffset: 4,
                     borderWidth: 0,
                     cutout: '75%'
                 }]
@@ -290,5 +356,57 @@
                 plugins: { legend: { display: false } }
             }
         });
+
+        // 4. REAL-TIME REFRESH FUNCTION
+        async function refreshDashboardData() {
+            try {
+                // Fetch Stock Data
+                const stockRes = await fetch('/Dashboard?handler=StockData');
+                if (stockRes.ok) {
+                    const stockData = await stockRes.json();
+                    stockChart.data.datasets[0].data = stockData;
+                    stockChart.update('none');
+                }
+
+                // Fetch Recent Transactions
+                const transRes = await fetch('/Dashboard?handler=RecentTransactions');
+                if (transRes.ok) {
+                    const transactions = await transRes.json();
+                    updateTransactionTable(transactions);
+                }
+            } catch (err) {
+                console.error("Real-time sync error:", err);
+            }
+        }
+
+        // Helper to update the table HTML
+        function updateTransactionTable(data) {
+            const tbody = document.querySelector('table tbody');
+            if (!tbody || data.length === 0) return;
+
+            let html = '';
+            data.forEach(tr => {
+                html += `
+                            <tr>
+                                <td class="fw-bold">#TRX-${tr.id}</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-light rounded-circle p-2 me-2" style="width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-size:10px;">
+                                            <i class="bi bi-person"></i>
+                                        </div>
+                                        ${tr.customerName}
+                                    </div>
+                                </td>
+                                <td class="fw-bold">$${tr.total}</td>
+                                <td class="text-muted small">${tr.time}</td>
+                                <td><span class="badge bg-soft-green badge-status">COMPLETED</span></td>
+                            </tr>`;
+            });
+            tbody.innerHTML = html;
+        }
+
+        // 5. START TIMERS
+        setInterval(refreshDashboardData, 5000); // Har 5 second baad refresh
+        refreshDashboardData(); // Foran load hone par refresh
     </script>
 }

@@ -8,44 +8,48 @@
 
 <input type="hidden" id="antiforgeryToken" value="@token">
 
-<div class="container-fluid pf-container">
+<div class="container-fluid pf-container bg-light">
     <div class="row vh-100 overflow-hidden">
 
-        <div class="col-md-8 bg-light d-flex flex-column p-4">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4 class="fw-bold text-dark m-0">Billing Terminal</h4>
+        <div class="col-md-8 d-flex flex-column p-4">
+            <div class="d-flex justify-content-between align-items-end mb-4">
+                <div>
+                    <h4 class="fw-bold text-dark m-0">Billing Terminal</h4>
+                    <small class="text-muted">Select products to add to order</small>
+                </div>
 
-                <div class="category-wrapper">
-                    <button class="cat-pill active" onclick="filterCategory('All', this)">All Items</button>
+                <div class="category-wrapper d-flex gap-2">
+                    <button class="cat-pill active" onclick="filterCategory('All', this)">All</button>
                     <button class="cat-pill" onclick="filterCategory('Food', this)">Food</button>
-                    <button class="cat-pill" onclick="filterCategory('Electronic', this)">Electronic</button>
+                    <button class="cat-pill" onclick="filterCategory('Electronic', this)">Electronics</button>
                     <button class="cat-pill" onclick="filterCategory('Grocery', this)">Grocery</button>
                 </div>
             </div>
 
-            <div class="row g-3 flex-grow-1 overflow-auto pe-1" id="pList">
+            <div class="row g-3 overflow-auto flex-grow-1 pt-2" id="pList" style="align-content: start;">
                 @foreach (var p in Model.Products)
                 {
-                    <div class="col-md-3 pos-item" data-category="@p.Category">
+                    <div class="col-xl-3 col-lg-4 col-md-6 pos-item" data-category="@p.Category">
                         <div class="product-card @(p.StockQuantity <= 0 ? "out-of-stock" : "")"
                              onclick="@(p.StockQuantity > 0 ? $"addToCart('{p.Id}', '{p.Name}', {p.Price}, {p.StockQuantity})" : "")">
 
                             <div class="icon-box">
-                                <i class="bi @(p.StockQuantity <= 0 ? "bi-exclamation-triangle text-danger" : "bi-box-seam")"></i>
+                                <i class="bi @(p.StockQuantity <= 0 ? "bi-exclamation-octagon text-danger" : "bi-box-seam")"></i>
                             </div>
 
-                            <h6 class="product-name">@p.Name</h6>
-                            <span class="product-price">$@p.Price.ToString("N2")</span>
-
-                            <div class="mt-2">
-                                @if (p.StockQuantity <= 0)
-                                {
-                                    <span class="badge bg-danger rounded-pill small">Sold Out</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-light text-muted border rounded-pill small">Stock: @p.StockQuantity</span>
-                                }
+                            <div class="product-info mt-2">
+                                <h6 class="product-name">@p.Name</h6>
+                                <div class="d-flex justify-content-between align-items-center mt-2">
+                                    <span class="product-price">$@p.Price.ToString("N2")</span>
+                                    @if (p.StockQuantity <= 0)
+                                    {
+                                        <span class="badge bg-danger-subtle text-danger border-0">Sold Out</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-light text-muted border small">Qty: @p.StockQuantity</span>
+                                    }
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -53,39 +57,49 @@
             </div>
         </div>
 
-        <div class="col-md-4 bg-white shadow-lg d-flex flex-column p-4 cart-sidebar">
-            <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
-                <h5 class="fw-bold m-0 text-dark">Current Order</h5>
-                <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">LIVE</span>
+        <div class="col-md-4 bg-white shadow-sm d-flex flex-column p-4 cart-sidebar border-start">
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                <h5 class="fw-bold m-0 text-dark"><i class="bi bi-receipt me-2"></i>Current Order</h5>
+                <span class="badge bg-success-subtle text-success rounded-pill px-3">Active</span>
             </div>
 
-            <div class="mb-3">
-                <label class="small fw-bold text-muted mb-1">Customer Info</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-light border-0"><i class="bi bi-person"></i></span>
-                    <input type="text" id="custName" class="form-control bg-light border-0 shadow-none" placeholder="Guest Customer">
+            <div class="mb-4">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-person"></i></span>
+                    <input type="text" id="custName" class="form-control border-start-0 ps-0 shadow-none" placeholder="Customer Name (Optional)">
                 </div>
             </div>
 
-            <div id="cartItems" class="flex-grow-1 overflow-auto cart-items-list mb-3">
+            <div id="cartItems" class="flex-grow-1 overflow-auto mb-3 pe-2">
                 <div class="text-center text-muted mt-5 empty-msg">
-                    <i class="bi bi-cart3 display-4 d-block mb-3 opacity-25"></i>
-                    <p class="small">Click on cards to add items</p>
+                    <i class="bi bi-cart3 display-1 d-block mb-3 opacity-10"></i>
+                    <p class="fw-medium">Your cart is empty</p>
                 </div>
             </div>
 
-            <div class="order-summary-box pt-3 border-top">
+            <div class="order-summary-box pt-3 border-top bg-light p-3 rounded-4">
                 <div class="d-flex justify-content-between mb-2">
-                    <span class="text-muted small">Total Items</span>
-                    <span class="fw-bold" id="itemCount">0</span>
+                    <span class="text-muted small">Items Count:</span>
+                    <span class="fw-bold small" id="itemCount">0</span>
                 </div>
-                <div class="d-flex justify-content-between h3 fw-bold text-dark mb-4 mt-2">
-                    <span>Total</span>
-                    <span id="grandTotal" style="color: #005f73;">$0.00</span>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted small">Subtotal:</span>
+                    <span class="fw-bold small" id="subtotalAmount">$0.00</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted small">Tax (5%):</span>
+                    <span class="text-primary fw-bold small" id="taxAmount">$0.00</span>
                 </div>
 
-                <button class="btn btn-dark w-100 btn-checkout py-3 fw-bold rounded-4 shadow-sm" id="btnPlaceOrder" onclick="checkout()">
-                    <i class="bi bi-credit-card-2-back me-2"></i> COMPLETE BILLING
+                <hr class="my-2" style="border-top: 1px dashed #cbd5e1;">
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <span class="h5 fw-bold m-0 text-dark">Grand Total</span>
+                    <span class="h3 fw-bold m-0" id="grandTotal" style="color: #005f73;">$0.00</span>
+                </div>
+
+                <button class="btn btn-dark w-100 btn-checkout py-3 fw-bold rounded-3 shadow-sm" id="btnPlaceOrder" onclick="checkout()">
+                    <i class="bi bi-check-circle-fill me-2"></i> COMPLETE BILLING
                 </button>
             </div>
         </div>
@@ -95,119 +109,113 @@
 <style>
     :root {
         --primary-teal: #005f73;
-        --accent-orange: #fb8500;
-        --light-bg: #f4f7f6;
+        --soft-bg: #f8f9fa;
     }
 
-    /* Grid ko tight karne ke liye minmax 140px kiya */
-    .product-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
-        gap: 12px; /* Gaps mazeed kam */
-        padding: 10px;
-    }
-
-    /* Card ka size chota aur compact */
-    .product-card {
+    /* Category Buttons Styling */
+    .cat-pill {
+        border: 1px solid #dee2e6;
         background: white;
-        border-radius: 16px; /* Slightly less rounded for smaller size */
-        padding: 12px; /* Reduced padding */
-        text-align: center;
-        transition: all 0.3s ease;
-        border: 1px solid rgba(0,0,0,0.03);
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        min-height: 300px; /* Fixed height taaki alignment kharab na ho */
+        padding: 6px 18px;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #495057;
+        transition: 0.2s;
     }
 
-        .product-card:hover:not(.out-of-stock) {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.08);
+        .cat-pill.active {
+            background: var(--primary-teal);
+            color: white;
             border-color: var(--primary-teal);
         }
 
-    /* Icon box ko aur chota kiya */
+    /* Refined Product Card */
+    .product-card {
+        background: white;
+        border-radius: 12px;
+        padding: 16px;
+        text-align: left; /* Alignment improved */
+        transition: all 0.2s ease-in-out;
+        border: 1px solid #edf2f7;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-height: 160px; /* Reduced unnecessary height */
+    }
+
+        .product-card:hover:not(.out-of-stock) {
+            border-color: var(--primary-teal);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
     .icon-box {
-        width: 40px;
-        height: 40px;
-        background: #f0f9fa;
+        width: 45px;
+        height: 45px;
+        background: #f0fdfa;
         color: var(--primary-teal);
         border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 8px;
-        font-size: 1.2rem;
+        font-size: 1.4rem;
     }
 
-    /* Text size chota kiya taaki box chota lagay */
     .product-name {
-        font-size: 1.0rem;
-        font-weight: 800;
-        color: #334155;
-        margin-bottom: 4px;
-        line-height: 1.2;
-        height: 2rem; /* Max 2 lines */
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #2d3748;
+        margin: 10px 0 5px 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
         overflow: hidden;
     }
 
     .product-price {
         color: var(--primary-teal);
         font-weight: 800;
-        font-size: 0.9rem;
-        margin-bottom: 5px;
+        font-size: 1.1rem;
     }
 
-    .stock-badge {
-        font-size: 0.65rem;
-        background: #f8fafc;
-        color: #64748b;
-        padding: 2px 8px;
-        border-radius: 8px;
-        border: 1px solid #e2e8f0;
-    }
-
-    /* Sold Out Ribbon - mazeed compact */
-    .out-of-stock::after {
-        content: "SOLD OUT";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        background: rgba(239, 68, 68, 0.85);
-        color: white;
-        font-size: 0.6rem;
-        font-weight: 800;
-        padding: 2px 0;
-        border-radius: 16px 16px 0 0; /* Card ke top par fix */
-    }
-
+    /* Out of stock logic */
     .out-of-stock {
-        opacity: 0.6;
-        filter: grayscale(1);
+        opacity: 0.7;
+        background: #fafafa;
+        cursor: not-allowed;
     }
 
-    /* Sidebar buttons aur search field ko bhi compact rakhein */
+    /* Cart Items Design */
+    .cart-item {
+        padding: 12px;
+        background: #f8fafc;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        border-left: 4px solid var(--primary-teal);
+    }
+
+    /* Sidebar Customization */
+    .cart-sidebar {
+        z-index: 10;
+    }
+
     .btn-checkout {
-        padding: 10px;
-        font-size: 0.9rem;
-        border-radius: 12px;
+        background: var(--primary-teal) !important;
+        border: none;
     }
 </style>
-
 @section Scripts {
     <script>
         let cart = [];
-        let total = 0;
+        let subtotal = 0;
+        let taxRate = 0.05; // 5% Tax
 
         function addToCart(id, name, price, stock) {
             const existingItem = cart.find(i => i.id === id);
 
             if (existingItem) {
-                // Check agar cart mein quantity stock se zyada na ho jaye
                 if (existingItem.qty >= stock) {
                     alert("Bas bhai! Itna hi stock bacha hai.");
                     return;
@@ -222,25 +230,31 @@
         function updateCartUI() {
             const container = document.getElementById('cartItems');
             const totalItemsLabel = document.getElementById('itemCount');
+
+            // In IDs ko apne HTML mein check kar lein ya add kar lein
+            const subtotalLabel = document.getElementById('subtotalAmount');
+            const taxLabel = document.getElementById('taxAmount');
             const grandTotalLabel = document.getElementById('grandTotal');
 
             if (cart.length === 0) {
                 container.innerHTML = `<div class="text-center text-muted mt-5 empty-msg"><i class="bi bi-cart3 display-4 d-block mb-3 opacity-25"></i><p class="small">Click on cards to add items</p></div>`;
                 totalItemsLabel.innerText = "0";
+                if (subtotalLabel) subtotalLabel.innerText = "$0.00";
+                if (taxLabel) taxLabel.innerText = "$0.00";
                 grandTotalLabel.innerText = "$0.00";
-                total = 0;
+                subtotal = 0;
                 return;
             }
 
             container.innerHTML = '';
-            total = 0;
+            subtotal = 0;
             let totalQty = 0;
 
             cart.forEach((item, index) => {
-                total += (item.price * item.qty);
+                subtotal += (item.price * item.qty);
                 totalQty += item.qty;
                 container.innerHTML += `
-                            <div class="cart-item d-flex justify-content-between align-items-center">
+                            <div class="cart-item d-flex justify-content-between align-items-center p-2 mb-2 bg-light rounded shadow-sm">
                                 <div style="flex: 1;">
                                     <h6 class="mb-0 fw-bold small">${item.name}</h6>
                                     <small class="text-muted">$${item.price.toFixed(2)} x ${item.qty}</small>
@@ -252,8 +266,16 @@
                             </div>`;
             });
 
+            // --- Tax Calculation Logic ---
+            let taxTotal = subtotal * taxRate;
+            let finalGrandTotal = subtotal + taxTotal;
+
             totalItemsLabel.innerText = totalQty;
-            grandTotalLabel.innerText = `$${total.toFixed(2)}`;
+
+            // UI Updates
+            if (subtotalLabel) subtotalLabel.innerText = `$${subtotal.toFixed(2)}`;
+            if (taxLabel) taxLabel.innerText = `$${taxTotal.toFixed(2)}`;
+            grandTotalLabel.innerText = `$${finalGrandTotal.toFixed(2)}`;
         }
 
         function removeItem(index) {
@@ -270,15 +292,20 @@
         }
 
         async function checkout() {
-            if (cart.length === 0) return alert("Cart khali hai!");
+            if (cart.length === 0) return alert("Cart is empty!");
 
             const btn = document.getElementById('btnPlaceOrder');
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
 
+            // Tax and Total re-calculation for security
+            let currentSubtotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+            let currentTax = currentSubtotal * taxRate;
+            let currentGrandTotal = currentSubtotal + currentTax;
+
             const orderData = {
                 customerName: document.getElementById('custName').value || "Guest Customer",
-                grandTotal: parseFloat(total),
+                grandTotal: parseFloat(currentGrandTotal.toFixed(2)), // Tax ke sath final amount
                 orderDate: new Date().toISOString(),
                 items: cart.map(i => ({
                     productId: i.id,
@@ -300,7 +327,6 @@
 
                 const res = await response.json();
                 if (res.success) {
-                    // Success ke baad Sales History par bhej dein
                     window.location.href = "/SalesHistory";
                 } else {
                     alert("Error: " + res.message);
