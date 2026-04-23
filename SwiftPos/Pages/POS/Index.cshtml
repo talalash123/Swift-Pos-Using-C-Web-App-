@@ -106,11 +106,71 @@
     </div>
 </div>
 
+<div class="modal fade" id="receiptModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-body p-4" id="printArea">
+                <div class="text-center mb-3">
+                    <h5 class="fw-bold mb-0">SWIFTPOS</h5>
+                    <small class="text-muted">Digital Receipt</small>
+                    <hr class="my-2" style="border-top: 1px dashed #000;">
+                </div>
+
+                <div class="mb-3 small">
+                    <div class="d-flex justify-content-between">
+                        <span>Date:</span> <span id="rDate"></span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Customer:</span> <span id="rCustName"></span>
+                    </div>
+                </div>
+
+                <table class="table table-sm table-borderless small mb-0">
+                    <thead>
+                        <tr class="border-bottom">
+                            <th>Item</th>
+                            <th class="text-center">Qty</th>
+                            <th class="text-end">Price</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rItemsBody">
+                    </tbody>
+                </table>
+
+                <hr class="my-2" style="border-top: 1px dashed #000;">
+
+                <div class="small">
+                    <div class="d-flex justify-content-between">
+                        <span>Subtotal:</span> <span id="rSubtotal"></span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Tax (5%):</span> <span id="rTax"></span>
+                    </div>
+                    <div class="d-flex justify-content-between fw-bold mt-2 pt-2 border-top h6">
+                        <span>GRAND TOTAL:</span> <span id="rTotal"></span>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4 pt-2">
+                    <p class="small mb-0">*** Thank You! ***</p>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-3 bg-light">
+                <button type="button" class="btn btn-outline-secondary w-100" onclick="window.location.reload()">Close & New Order</button>
+                <button type="button" class="btn btn-dark w-100" onclick="printReceipt()">
+                    <i class="bi bi-printer me-2"></i>Print Receipt
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
     :root {
         --primary-teal: #005f73;
         --soft-bg: #f8f9fa;
     }
+
 
     /* Category Buttons Styling */
     .cat-pill {
@@ -298,14 +358,13 @@
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
 
-            // Tax and Total re-calculation for security
             let currentSubtotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
             let currentTax = currentSubtotal * taxRate;
             let currentGrandTotal = currentSubtotal + currentTax;
 
             const orderData = {
                 customerName: document.getElementById('custName').value || "Guest Customer",
-                grandTotal: parseFloat(currentGrandTotal.toFixed(2)), // Tax ke sath final amount
+                grandTotal: parseFloat(currentGrandTotal.toFixed(2)),
                 orderDate: new Date().toISOString(),
                 items: cart.map(i => ({
                     productId: i.id,
@@ -327,17 +386,46 @@
 
                 const res = await response.json();
                 if (res.success) {
-                    window.location.href = "/SalesHistory";
+                    // --- Receipt Modal Fill Logic ---
+                    document.getElementById('rDate').innerText = new Date().toLocaleString();
+                    document.getElementById('rCustName').innerText = orderData.customerName;
+                    document.getElementById('rSubtotal').innerText = `$${currentSubtotal.toFixed(2)}`;
+                    document.getElementById('rTax').innerText = `$${currentTax.toFixed(2)}`;
+                    document.getElementById('rTotal').innerText = `$${currentGrandTotal.toFixed(2)}`;
+
+                    let itemsHtml = '';
+                    cart.forEach(i => {
+                        itemsHtml += `<tr>
+                            <td>${i.name}</td>
+                            <td class="text-center">${i.qty}</td>
+                            <td class="text-end">$${(i.price * i.qty).toFixed(2)}</td>
+                        </tr>`;
+                    });
+                    document.getElementById('rItemsBody').innerHTML = itemsHtml;
+
+                    // Show Modal
+                    const receiptModal = new bootstrap.Modal(document.getElementById('receiptModal'));
+                    receiptModal.show();
                 } else {
                     alert("Error: " + res.message);
                     btn.disabled = false;
-                    btn.innerHTML = '<i class="bi bi-credit-card-2-back me-2"></i> COMPLETE BILLING';
+                    btn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i> COMPLETE BILLING';
                 }
             } catch (err) {
                 alert("Server Error!");
                 btn.disabled = false;
-                btn.innerHTML = '<i class="bi bi-credit-card-2-back me-2"></i> COMPLETE BILLING';
+                btn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i> COMPLETE BILLING';
             }
         }
+
+        // Print Function
+        function printReceipt() {
+            const printContent = document.getElementById('printArea').innerHTML;
+            const originalContent = document.body.innerHTML;
+            document.body.innerHTML = printContent;
+            window.print();
+            document.body.innerHTML = originalContent;
+            window.location.reload(); // Reset everything after print
+        } 
     </script>
 }
