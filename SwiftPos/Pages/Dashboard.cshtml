@@ -6,160 +6,132 @@
 
 <style>
     :root {
-        --pos-primary: #004654; /* Darker teal for better contrast */
+        --pos-primary: #004654;
         --pos-secondary: #0a9396;
-        --pos-accent: #94d2bd;
-        --pos-bg: #f4f7f6;
-        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-        --glass-bg: rgba(255, 255, 255, 0.95);
+        --pos-bg: #f8fafb;
+        --glass: rgba(255, 255, 255, 0.9);
+        --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
     }
 
     body {
         background-color: var(--pos-bg);
-        font-family: 'Inter', system-ui, -apple-system, sans-serif;
-        color: #2d3436;
+        font-family: 'Inter', sans-serif;
+        color: #334155;
     }
 
-    /* Page Heading Enhancement */
-    h3.fw-bold {
-        letter-spacing: -0.5px;
-        color: var(--pos-primary);
-    }
-
-    /* Modern Stats Cards */
+    /* 1. Subtle Stat Cards */
     .stat-card {
-        border: 1px solid rgba(255, 255, 255, 0.8);
-        border-radius: 20px;
+        border: none;
+        border-radius: 24px;
+        background: white;
         box-shadow: var(--card-shadow);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        background: var(--glass-bg);
-        position: relative;
-        z-index: 1;
+        transition: all 0.3s ease;
+        padding: 1.5rem;
     }
 
         .stat-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
-            border-color: var(--pos-secondary);
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.06);
         }
 
-    /* Icon Background Gradients */
     .stat-icon {
-        width: 56px;
-        height: 56px;
-        border-radius: 14px;
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.6rem;
-        transition: all 0.3s ease;
+        font-size: 1.4rem;
+        flex-shrink: 0;
     }
 
-    .stat-card:hover .stat-icon {
-        transform: scale(1.1) rotate(-5deg);
-    }
-
-    /* Content Box (Charts/Tables) */
+    /* 2. Content Boxes (Charts/Tables) */
     .content-box {
-        background: #fff;
-        border-radius: 24px;
-        padding: 28px;
+        background: white;
+        border-radius: 28px;
+        padding: 2rem;
         box-shadow: var(--card-shadow);
-        border: 1px solid rgba(0,0,0,0.02);
-        height: 100%;
+        border: 1px solid rgba(0,0,0,0.01);
     }
 
-    /* Table Styling */
-    .table-container {
-        border-radius: 16px;
-        overflow: hidden;
-    }
-
+    /* 3. Table Refinement - Light & Clean */
     .table thead th {
-        background-color: #fcfdfe;
+        background-color: transparent;
         text-transform: uppercase;
-        font-size: 0.7rem;
-        letter-spacing: 1px;
-        font-weight: 800;
-        color: #a0aec0;
-        border-bottom: 2px solid #f7fafc;
-        padding: 20px 15px;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        font-weight: 700;
+        color: #94a3b8;
+        border-bottom: 1px solid #f1f5f9;
+        padding: 15px;
     }
 
     .table tbody td {
-        padding: 18px 15px;
-        vertical-align: middle;
+        padding: 16px 15px;
         font-size: 0.9rem;
-        border-bottom: 1px solid #f7fafc;
-        transition: background 0.2s;
+        border-bottom: 1px solid #f8fafc;
+        color: #475569;
+    }
+
+    .table tbody tr:last-child td {
+        border: none;
     }
 
     .table tbody tr:hover td {
-        background-color: #fbfcfd;
+        background-color: #fcfdfe;
     }
 
+    /* 4. Smooth Status Badges */
+    .badge-status {
+        padding: 6px 12px;
+        border-radius: 10px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: capitalize;
+    }
+
+    /* 5. Live Indicator */
     .live-dot {
         height: 8px;
         width: 8px;
-        background-color: #2ec4b6;
+        background-color: #10b981;
         border-radius: 50%;
         display: inline-block;
-        animation: blink 1.5s infinite;
+        margin-right: 5px;
+        box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
     }
 
-    @@keyframes blink {
-        0% {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        50% {
-            opacity: 0.4;
-            transform: scale(1.2);
-        }
-
-        100% {
-            opacity: 1;
-            transform: scale(1);
-        }
-    /* New Soft Color Palette */
+    /* Soft Color Gradients for Icons */
     .bg-soft-teal {
-        background: linear-gradient(135deg, #e6f7f8 0%, #b2e2e5 100%);
-        color: #005f73;
+        background: #f0f9fa;
+        color: #0891b2;
     }
 
     .bg-soft-green {
-        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-        color: #1b5e20;
+        background: #f0fdf4;
+        color: #16a34a;
     }
 
     .bg-soft-orange {
-        background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
-        color: #e65100;
+        background: #fffaf5;
+        color: #ea580c;
     }
 
     .bg-soft-purple {
-        background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
-        color: #4a148c;
+        background: #faf5ff;
+        color: #9333ea;
     }
 
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar {
-        width: 6px;
+    /* Custom Header Adjustment */
+    h3.fw-bold {
+        color: #1e293b;
+        font-weight: 800 !important;
     }
 
-    ::-webkit-scrollbar-track {
-        background: #f1f1f1;
+    .text-muted.small {
+        color: #64748b !important;
     }
 
-    ::-webkit-scrollbar-thumb {
-        background: #cbd5e0;
-        border-radius: 10px;
-    }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #a0aec0;
-        }
 </style>
 
 <div class="container-fluid px-4">

@@ -12,147 +12,162 @@
         :root {
             --sidebar-bg: #ffffff;
             --primary-color: #005f73;
-            --active-bg: #e6f7f8;
+            --primary-light: #0a9396;
+            --active-bg: rgba(0, 95, 115, 0.05); /* Soft transparent teal */
             --text-muted: #94a3b8;
             --text-dark: #1e293b;
-            --sidebar-shadow: 10px 0 30px rgba(0,0,0,0.02);
+            --sidebar-shadow: 4px 0 24px rgba(0, 0, 0, 0.02);
+            --transition-speed: 0.3s;
         }
 
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #f1f5f9;
-            margin: 0;
-        }
+       body {
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden; /* Horizontal scrollbar ko rokne ke liye */
+    }
 
-        /* --- MODERN SIDEBAR --- */
-        .sidebar {
-            width: 280px;
-            height: 100vh;
-            background: var(--sidebar-bg);
-            border-right: 1px solid #e2e8f0; /* Dashed ki jagah solid thora zyada professional lagta hai */
-            position: fixed;
-            padding: 24px 16px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: var(--sidebar-shadow);
-            z-index: 1000;
-        }
+    .sidebar {
+        width: 280px;
+        height: 100vh;
+        position: fixed; /* Sidebar apni jagah par jam jayega */
+        top: 0;
+        left: 0;
+        z-index: 1000;
+        background: var(--sidebar-bg);
+        border-right: 1px solid #e2e8f0;
+    }
 
-        /* Logo Area */
+    .main-content {
+        /* Sidebar ki width 280px hai, isliye margin bhi 280px hoga */
+        margin-left: 280px; 
+        
+        /* Width ko auto ya 100% - 280px par set karein */
+        width: calc(100% - 280px); 
+        
+        padding: 30px;
+        min-height: 100vh;
+        background-color: #f1f5f9;
+        transition: all 0.3s ease;
+        display: block; /* Ensure it behaves as a block */
+    }
+
+    /* Responsive fix: Agar mobile par sidebar chhupana ho */
+        @@media screen and (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 20px;
+            }
+        }
+        /* Logo Area Enhancement */
         .brand-logo {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 0 12px 30px;
+            gap: 14px;
+            padding: 0 12px 40px;
         }
 
         .logo-box {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary-color) 0%, #0a9396 100%);
-            border-radius: 12px;
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 1.3rem;
-            box-shadow: 0 4px 10px rgba(0, 95, 115, 0.2);
+            font-size: 1.4rem;
+            box-shadow: 0 8px 16px rgba(0, 95, 115, 0.15);
         }
 
-        /* Nav Links */
+        /* Nav Labels */
         .nav-label {
-            font-size: 0.65rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            font-weight: 800;
-            color: var(--text-muted);
-            margin: 20px 12px 10px;
+            letter-spacing: 1.2px;
+            font-weight: 700;
+            color: #cbd5e1;
+            margin: 24px 12px 12px;
         }
 
+        /* Modern Nav Link Style */
         .nav-link {
             color: #64748b;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             padding: 12px 16px;
             border-radius: 12px;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             display: flex;
             align-items: center;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all var(--transition-speed) ease;
             text-decoration: none !important;
+            position: relative;
         }
 
-            /* Icon Fix: Is se icon aur text bilkul align rahenge */
             .nav-link i {
                 font-size: 1.2rem;
-                width: 28px; /* Fixed width taaki text ek hi vertical line mein ho */
-                display: flex;
-                align-items: center;
-                justify-content: flex-start;
-                transition: 0.3s;
+                width: 32px;
+                transition: var(--transition-speed);
+                color: #94a3b8;
             }
 
-            /* Active & Hover States */
+            /* Hover State: Gentle lift and color change */
             .nav-link:hover {
-                background: #f8fafc;
+                background: #f1f5f9;
                 color: var(--primary-color);
-                transform: translateX(5px);
+                transform: translateX(4px);
             }
 
-            .nav-link.active {
-                background: var(--active-bg);
-                color: var(--primary-color);
-                position: relative;
-            }
-
-                /* Active Dot Indicator */
-                .nav-link.active::after {
-                    content: '';
-                    position: absolute;
-                    right: 15px;
-                    width: 6px;
-                    height: 6px;
-                    background: var(--primary-color);
-                    border-radius: 50%;
-                    box-shadow: 0 0 8px var(--primary-color);
-                }
-
-                .nav-link.active i {
-                    transform: scale(1.1);
+                .nav-link:hover i {
                     color: var(--primary-color);
                 }
 
-        /* Main Content */
-        .main-content {
-            margin-left: 280px;
-            padding: 40px;
-            min-height: 100vh;
-        }
+            /* Active State: Elevated Look */
+            .nav-link.active {
+                background: var(--active-bg);
+                color: var(--primary-color);
+            }
 
-        /* Footer Section */
+                /* Active Indicator: A sleek bar on the left */
+                .nav-link.active::before {
+                    content: '';
+                    position: absolute;
+                    left: -20px; /* Aligns with sidebar padding */
+                    width: 4px;
+                    height: 24px;
+                    background: var(--primary-color);
+                    border-radius: 0 4px 4px 0;
+                }
+
+                .nav-link.active i {
+                    color: var(--primary-color);
+                    transform: scale(1.1);
+                }
+
+        /* Sidebar Footer Refinement */
         .sidebar-footer {
             margin-top: auto;
             background: #f8fafc;
-            padding: 14px;
-            border-radius: 16px;
+            padding: 16px;
+            border-radius: 20px;
             display: flex;
             align-items: center;
             gap: 12px;
             border: 1px solid #f1f5f9;
+            transition: 0.3s ease;
         }
 
-        .avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            background: var(--primary-color);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
+            .sidebar-footer:hover {
+                border-color: #e2e8f0;
+                background: #ffffff;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            }
     </style>
 </head>
 <body>
